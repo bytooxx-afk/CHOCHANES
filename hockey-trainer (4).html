@@ -1,0 +1,2232 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#080c10">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Inline Pro">
+<title>IRON TRACK</title>
+<link rel="manifest" href="manifest.json">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#080c10;--surface:#0f1520;--surface2:#151d2e;--accent:#00d4ff;--accent2:#ff6b35;--accent3:#39ff14;--text:#e8edf5;--muted:#5a6a80;--border:#1e2d42;}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min-height:100vh;overflow-x:hidden;}
+body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(0,212,255,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(0,212,255,0.03) 1px,transparent 1px);background-size:40px 40px;pointer-events:none;z-index:0;}
+.container{max-width:900px;margin:0 auto;padding:0 16px;position:relative;z-index:1;}
+
+/* HEADER */
+header{border-bottom:1px solid var(--border);padding:16px 0;position:sticky;top:0;background:rgba(8,12,16,0.96);backdrop-filter:blur(12px);z-index:200;}
+.header-inner{display:flex;align-items:center;justify-content:space-between;gap:12px;}
+.logo{font-family:'Bebas Neue',sans-serif;font-size:1.7rem;letter-spacing:3px;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;white-space:nowrap;}
+.today-badge{font-family:'Space Mono',monospace;font-size:0.65rem;color:var(--muted);text-transform:uppercase;letter-spacing:1px;text-align:right;}
+.today-badge span{color:var(--accent3);font-weight:700;}
+
+/* ATHLETE CARD */
+.athlete-card{margin:20px 0 0;background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px;display:grid;grid-template-columns:1fr auto;gap:16px;align-items:center;position:relative;overflow:hidden;}
+.athlete-card::after{content:'🏒';position:absolute;right:110px;top:50%;transform:translateY(-50%);font-size:4.5rem;opacity:0.05;}
+.athlete-name{font-family:'Bebas Neue',sans-serif;font-size:1.8rem;letter-spacing:2px;}
+.athlete-meta{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap;}
+.meta-pill{background:var(--surface2);border:1px solid var(--border);border-radius:20px;padding:3px 10px;font-size:0.72rem;font-family:'Space Mono',monospace;color:var(--muted);}
+.meta-pill b{color:var(--accent);}
+.goal-countdown{text-align:center;background:linear-gradient(135deg,rgba(0,212,255,0.1),rgba(255,107,53,0.1));border:1px solid rgba(0,212,255,0.2);border-radius:12px;padding:14px 18px;min-width:110px;}
+.countdown-num{font-family:'Bebas Neue',sans-serif;font-size:2.6rem;line-height:1;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.countdown-label{font-size:0.6rem;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-top:3px;}
+
+/* MACRO STRIP */
+.macro-strip{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:12px 0 0;}
+.macro-card-sm{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:10px;text-align:center;}
+.macro-val-sm{font-family:'Bebas Neue',sans-serif;font-size:1.4rem;line-height:1;}
+.macro-lbl-sm{font-size:0.62rem;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-top:2px;}
+
+/* TABS */
+.tab-nav{display:flex;gap:4px;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:4px;margin:14px 0;}
+.tab-btn{flex:1;padding:9px 4px;border:none;border-radius:8px;background:transparent;color:var(--muted);font-family:'Bebas Neue',sans-serif;font-size:0.9rem;letter-spacing:1.5px;cursor:pointer;transition:all 0.2s;white-space:nowrap;}
+.tab-btn:hover{color:var(--text);}
+.tab-btn.active{background:linear-gradient(135deg,rgba(0,212,255,0.15),rgba(255,107,53,0.08));color:var(--accent);border:1px solid rgba(0,212,255,0.25);}
+.tab-panel{display:none;}
+.tab-panel.active{display:block;animation:fadeIn 0.3s ease;}
+
+/* DAY SELECTOR */
+.day-selector{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:16px;}
+.day-btn{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 6px;cursor:pointer;transition:all 0.2s;text-align:center;color:var(--muted);font-family:'DM Sans',sans-serif;}
+.day-btn:hover{border-color:var(--accent);color:var(--text);transform:translateY(-1px);}
+.day-btn.active{background:linear-gradient(135deg,rgba(0,212,255,0.15),rgba(0,212,255,0.05));border-color:var(--accent);color:var(--accent);}
+.day-btn .day-number{font-family:'Bebas Neue',sans-serif;font-size:1.5rem;letter-spacing:1px;display:block;line-height:1;}
+.day-btn .day-label{font-size:0.68rem;text-transform:uppercase;letter-spacing:1px;margin-top:3px;}
+.today-marker{display:block;width:5px;height:5px;background:var(--accent3);border-radius:50%;margin:3px auto 0;}
+
+/* PROGRESS */
+.progress-bar-wrap{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:16px;}
+.progress-top{display:flex;justify-content:space-between;margin-bottom:8px;font-size:0.78rem;color:var(--muted);}
+.progress-track{height:5px;background:var(--surface2);border-radius:3px;overflow:hidden;}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent3));border-radius:3px;transition:width 0.4s ease;}
+
+/* SECTION HEADER */
+.section-header{display:flex;align-items:center;gap:10px;margin:20px 0 10px;}
+.section-title{font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:2px;color:var(--accent2);}
+.section-line{flex:1;height:1px;background:var(--border);}
+
+/* EXERCISE CARDS */
+.exercise-list{display:flex;flex-direction:column;gap:10px;}
+.exercise-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden;transition:border-color 0.2s;cursor:pointer;}
+.exercise-card:hover{border-color:rgba(0,212,255,0.3);}
+.exercise-card.completed{border-color:rgba(57,255,20,0.4);background:rgba(57,255,20,0.03);}
+.exercise-main{display:grid;grid-template-columns:48px 1fr auto;align-items:center;gap:12px;padding:13px 14px;}
+.exercise-num{font-family:'Bebas Neue',sans-serif;font-size:1.6rem;color:var(--border);text-align:center;line-height:1;transition:color 0.2s;}
+.exercise-card.completed .exercise-num{color:var(--accent3);}
+.exercise-name{font-weight:500;font-size:0.93rem;}
+.exercise-muscles{font-size:0.72rem;color:var(--muted);margin-top:2px;}
+.exercise-hockey{font-size:0.68rem;color:var(--accent2);margin-top:2px;font-style:italic;}
+.exercise-params{text-align:right;min-width:80px;}
+.param-sets{font-family:'Space Mono',monospace;font-size:0.85rem;color:var(--accent);font-weight:700;}
+.param-rest{font-size:0.68rem;color:var(--muted);margin-top:2px;}
+.exercise-detail{display:none;padding:0 14px 14px;border-top:1px solid var(--border);}
+.exercise-detail.open{display:block;}
+.exercise-tip{margin-top:12px;background:rgba(0,212,255,0.06);border-left:3px solid var(--accent);padding:9px 12px;border-radius:0 6px 6px 0;font-size:0.8rem;line-height:1.5;}
+.superset-label{font-family:'Space Mono',monospace;font-size:0.62rem;color:var(--accent2);text-transform:uppercase;letter-spacing:1px;padding:3px 9px;background:rgba(255,107,53,0.1);border-radius:4px;margin-bottom:5px;display:inline-block;}
+
+/* EXERCISE IMAGE */
+.exercise-img-wrap{margin-top:12px;border-radius:8px;overflow:hidden;border:1px solid var(--border);background:var(--surface2);position:relative;max-width:420px;}
+.exercise-img-wrap img{width:100%;height:180px;object-fit:cover;display:block;}
+.img-caption{position:absolute;bottom:0;left:0;right:0;background:linear-gradient(transparent,rgba(8,12,16,0.9));padding:16px 10px 6px;font-size:0.62rem;color:var(--muted);text-align:right;}
+
+/* WEIGHT LOG */
+.weight-log-section{margin-top:12px;background:rgba(0,212,255,0.04);border:1px solid rgba(0,212,255,0.15);border-radius:10px;padding:11px 13px;}
+.weight-log-title{font-family:'Space Mono',monospace;font-size:0.68rem;text-transform:uppercase;letter-spacing:1px;color:var(--accent);margin-bottom:10px;}
+.weight-log-grid{display:flex;flex-wrap:wrap;gap:7px;}
+.weight-log-item{display:flex;flex-direction:column;align-items:center;gap:3px;}
+.weight-log-label{font-size:0.62rem;color:var(--muted);text-transform:uppercase;}
+.weight-input{width:64px;background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text);font-family:'Space Mono',monospace;font-size:0.82rem;text-align:center;padding:5px 4px;transition:border-color 0.2s;-moz-appearance:textfield;}
+.weight-input::-webkit-outer-spin-button,.weight-input::-webkit-inner-spin-button{-webkit-appearance:none;}
+.weight-input:focus{outline:none;border-color:var(--accent);background:rgba(0,212,255,0.05);}
+.weight-input::placeholder{color:var(--border);}
+.weight-unit{font-size:0.58rem;color:var(--muted);}
+.weight-best{font-size:0.68rem;color:var(--accent3);font-family:'Space Mono',monospace;margin-top:6px;}
+
+/* WEIGHT HISTORY CHART */
+.weight-history-section{margin-top:10px;background:rgba(57,255,20,0.04);border:1px solid rgba(57,255,20,0.15);border-radius:10px;padding:11px 13px;}
+.wh-title{font-family:'Space Mono',monospace;font-size:0.68rem;text-transform:uppercase;letter-spacing:1px;color:var(--accent3);margin-bottom:8px;}
+.wh-chart{display:flex;align-items:flex-end;gap:4px;height:60px;padding-bottom:4px;}
+.wh-bar-wrap{display:flex;flex-direction:column;align-items:center;gap:2px;flex:1;}
+.wh-bar{background:linear-gradient(180deg,var(--accent3),rgba(57,255,20,0.3));border-radius:3px 3px 0 0;width:100%;min-height:3px;transition:height 0.4s ease;}
+.wh-bar-label{font-size:0.55rem;color:var(--muted);white-space:nowrap;}
+.wh-bar-val{font-size:0.6rem;color:var(--accent3);font-family:'Space Mono',monospace;}
+.wh-empty{color:var(--muted);font-size:0.75rem;padding:10px 0;}
+
+/* SET TRACKER */
+.set-tracker{display:flex;gap:7px;margin-top:10px;flex-wrap:wrap;}
+.set-dot{width:34px;height:34px;border-radius:8px;border:1px solid var(--border);background:var(--surface2);cursor:pointer;display:flex;align-items:center;justify-content:center;font-family:'Space Mono',monospace;font-size:0.68rem;color:var(--muted);transition:all 0.15s;position:relative;}
+.set-dot.done{background:rgba(57,255,20,0.15);border-color:var(--accent3);color:var(--accent3);}
+
+/* TIMER */
+.rest-timer-btn{display:inline-flex;align-items:center;gap:6px;background:rgba(255,107,53,0.1);border:1px solid rgba(255,107,53,0.3);color:var(--accent2);padding:6px 12px;border-radius:7px;cursor:pointer;font-size:0.75rem;font-family:'DM Sans',sans-serif;transition:all 0.2s;margin-top:10px;}
+.rest-timer-btn:hover{background:rgba(255,107,53,0.2);}
+
+/* FLOATING TIMER */
+.floating-timer{position:fixed;bottom:24px;right:20px;background:var(--surface);border:2px solid var(--accent2);border-radius:16px;padding:16px 20px;z-index:999;text-align:center;box-shadow:0 8px 32px rgba(0,0,0,0.5);min-width:140px;display:none;}
+.floating-timer.visible{display:block;animation:slideUp 0.3s ease;}
+@keyframes slideUp{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);}}
+.ft-label{font-size:0.65rem;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;}
+.ft-time{font-family:'Bebas Neue',sans-serif;font-size:3rem;line-height:1;color:var(--accent2);}
+.ft-time.urgent{color:#ff3333;animation:pulse 0.5s infinite;}
+.ft-close{position:absolute;top:8px;right:10px;background:none;border:none;color:var(--muted);cursor:pointer;font-size:1rem;}
+.ft-actions{display:flex;gap:8px;margin-top:10px;}
+.ft-btn{flex:1;padding:6px;border-radius:7px;border:1px solid var(--border);background:var(--surface2);color:var(--muted);cursor:pointer;font-size:0.75rem;transition:all 0.15s;}
+.ft-btn:hover{border-color:var(--accent);color:var(--accent);}
+
+/* ACTION BUTTONS */
+.action-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:10px;}
+.check-btn{background:none;border:1px solid var(--border);color:var(--muted);padding:6px 13px;border-radius:6px;cursor:pointer;font-size:0.75rem;font-family:'DM Sans',sans-serif;transition:all 0.2s;}
+.check-btn:hover{border-color:var(--accent3);color:var(--accent3);}
+.exercise-card.completed .check-btn{background:rgba(57,255,20,0.1);border-color:var(--accent3);color:var(--accent3);}
+.video-link{display:inline-flex;align-items:center;gap:5px;font-size:0.72rem;color:var(--accent);text-decoration:none;padding:5px 10px;border:1px solid rgba(0,212,255,0.3);border-radius:6px;transition:all 0.2s;}
+.video-link:hover{background:rgba(0,212,255,0.1);}
+
+/* FINISHER */
+.finisher-card{background:linear-gradient(135deg,rgba(255,107,53,0.1),rgba(0,212,255,0.05));border:1px solid rgba(255,107,53,0.3);border-radius:12px;padding:18px;margin-top:10px;}
+.finisher-title{font-family:'Bebas Neue',sans-serif;font-size:1.3rem;letter-spacing:2px;color:var(--accent2);margin-bottom:10px;}
+.finisher-item{display:flex;justify-content:space-between;align-items:center;padding:9px 12px;background:rgba(8,12,16,0.5);border-radius:8px;font-size:0.85rem;margin-bottom:6px;}
+.finisher-time{font-family:'Space Mono',monospace;color:var(--accent2);font-size:0.78rem;}
+
+/* RPE */
+.rpe-section{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px;margin-top:16px;}
+.rpe-title{font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:2px;color:var(--text);margin-bottom:10px;}
+.rpe-scale{display:flex;gap:5px;flex-wrap:wrap;}
+.rpe-btn{width:36px;height:36px;border-radius:8px;border:1px solid var(--border);background:var(--surface2);color:var(--muted);cursor:pointer;font-family:'Space Mono',monospace;font-size:0.78rem;transition:all 0.15s;}
+.rpe-btn.active{border-color:var(--accent2);background:rgba(255,107,53,0.15);color:var(--accent2);}
+.rpe-note{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:0.82rem;padding:9px 12px;margin-top:10px;resize:none;height:70px;}
+.rpe-note:focus{outline:none;border-color:var(--accent);}
+.rpe-save-btn{margin-top:8px;background:rgba(0,212,255,0.1);border:1px solid rgba(0,212,255,0.3);color:var(--accent);padding:8px 16px;border-radius:8px;cursor:pointer;font-size:0.78rem;font-family:'DM Sans',sans-serif;transition:all 0.2s;}
+.rpe-save-btn:hover{background:rgba(0,212,255,0.2);}
+.rpe-saved{color:var(--accent3);font-size:0.75rem;margin-top:6px;display:none;}
+
+/* PHASE TAG */
+.phase-tag{display:inline-block;background:rgba(57,255,20,0.1);border:1px solid rgba(57,255,20,0.3);color:var(--accent3);font-family:'Space Mono',monospace;font-size:0.62rem;text-transform:uppercase;letter-spacing:2px;padding:3px 9px;border-radius:4px;margin-right:7px;}
+.workout-title{font-family:'Bebas Neue',sans-serif;font-size:2.2rem;letter-spacing:2px;line-height:1;margin-top:8px;}
+.workout-subtitle{color:var(--muted);font-size:0.82rem;margin-top:5px;}
+
+/* ── NUTRITION ── */
+.nutri-hero{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:20px;margin-bottom:16px;}
+.nutri-hero-title{font-family:'Bebas Neue',sans-serif;font-size:1.7rem;letter-spacing:2px;margin-bottom:5px;}
+.nutri-hero-sub{font-size:0.8rem;color:var(--muted);line-height:1.5;}
+.nutri-macros{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:14px;}
+.nmacro{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px;text-align:center;}
+.nmacro-val{font-family:'Bebas Neue',sans-serif;font-size:1.4rem;line-height:1;}
+.nmacro-lbl{font-size:0.6rem;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-top:3px;}
+.meal-day-selector{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-bottom:16px;}
+.meal-day-btn{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:10px 5px;cursor:pointer;text-align:center;color:var(--muted);font-family:'DM Sans',sans-serif;font-size:0.75rem;transition:all 0.2s;line-height:1.3;}
+.meal-day-btn:hover{border-color:var(--accent2);color:var(--text);}
+.meal-day-btn.active{background:linear-gradient(135deg,rgba(255,107,53,0.15),rgba(255,107,53,0.05));border-color:var(--accent2);color:var(--accent2);}
+.meal-day-btn .mdb-icon{font-size:1.2rem;display:block;margin-bottom:3px;}
+.meal-day-btn .mdb-label{font-weight:600;font-size:0.72rem;}
+.meal-day-btn .mdb-type{font-size:0.6rem;opacity:0.7;margin-top:2px;}
+.meal-timeline{display:flex;flex-direction:column;gap:10px;}
+.meal-block{background:var(--surface);border:1px solid var(--border);border-radius:13px;overflow:hidden;}
+.meal-block-header{display:flex;align-items:center;gap:12px;padding:13px 14px;cursor:pointer;transition:background 0.15s;}
+.meal-block-header:hover{background:rgba(255,255,255,0.02);}
+.meal-time-badge{background:var(--surface2);border:1px solid var(--border);border-radius:7px;padding:5px 9px;font-family:'Space Mono',monospace;font-size:0.68rem;color:var(--accent);white-space:nowrap;min-width:68px;text-align:center;}
+.meal-info{flex:1;}
+.meal-name{font-weight:600;font-size:0.92rem;}
+.meal-desc{font-size:0.75rem;color:var(--muted);margin-top:2px;}
+.meal-kcal{font-family:'Space Mono',monospace;font-size:0.75rem;color:var(--accent2);white-space:nowrap;}
+.meal-detail-body{display:none;padding:0 14px 14px;border-top:1px solid var(--border);}
+.meal-detail-body.open{display:block;}
+.meal-options{margin-top:12px;display:flex;flex-direction:column;gap:7px;}
+.meal-option{background:var(--surface2);border:1px solid var(--border);border-radius:9px;padding:11px 13px;cursor:pointer;transition:all 0.18s;position:relative;}
+.meal-option:hover{border-color:rgba(255,107,53,0.4);}
+.meal-option.selected{border-color:var(--accent2);background:rgba(255,107,53,0.06);}
+.meal-option.selected::after{content:'✓';position:absolute;top:9px;right:11px;color:var(--accent2);font-weight:700;}
+.option-title{font-weight:600;font-size:0.85rem;margin-bottom:3px;padding-right:18px;}
+.option-detail{font-size:0.76rem;color:var(--muted);line-height:1.5;}
+.option-macros{display:flex;gap:8px;margin-top:7px;flex-wrap:wrap;}
+.opt-macro{font-family:'Space Mono',monospace;font-size:0.62rem;padding:2px 7px;border-radius:4px;border:1px solid var(--border);color:var(--muted);}
+.opt-macro.prot{border-color:rgba(255,107,53,0.4);color:var(--accent2);}
+.opt-macro.kcal{border-color:rgba(0,212,255,0.3);color:var(--accent);}
+
+/* HYDRATION */
+.hydration-card{background:var(--surface);border:1px solid var(--border);border-radius:13px;padding:16px;margin-top:16px;}
+.hydration-title{font-family:'Bebas Neue',sans-serif;font-size:1.2rem;letter-spacing:2px;margin-bottom:12px;}
+.hydration-track{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;}
+.water-glass{width:40px;height:50px;cursor:pointer;border-radius:0 0 8px 8px;border:2px solid var(--border);background:var(--surface2);transition:all 0.2s;position:relative;overflow:hidden;}
+.water-glass.filled{border-color:var(--accent);}
+.water-glass.filled::after{content:'';position:absolute;bottom:0;left:0;right:0;height:100%;background:linear-gradient(180deg,rgba(0,212,255,0.6),rgba(0,212,255,0.3));border-radius:0 0 6px 6px;animation:fillUp 0.3s ease;}
+@keyframes fillUp{from{height:0;}to{height:100%;}}
+.water-glass::before{content:'💧';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:1rem;opacity:0.3;}
+.water-glass.filled::before{opacity:0.8;}
+.hydration-label{font-size:0.78rem;color:var(--muted);}
+.hydration-label span{color:var(--accent);font-weight:600;font-family:'Space Mono',monospace;}
+
+/* ── RECOVERY TAB ── */
+.recovery-hero{background:linear-gradient(135deg,rgba(57,255,20,0.08),rgba(0,212,255,0.05));border:1px solid rgba(57,255,20,0.2);border-radius:14px;padding:20px;margin-bottom:16px;}
+.recovery-title{font-family:'Bebas Neue',sans-serif;font-size:1.8rem;letter-spacing:2px;color:var(--accent3);margin-bottom:6px;}
+.recovery-sub{font-size:0.8rem;color:var(--muted);line-height:1.5;}
+.recovery-selector{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px;}
+.rec-btn{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 8px;cursor:pointer;text-align:center;color:var(--muted);font-family:'DM Sans',sans-serif;transition:all 0.2s;}
+.rec-btn:hover{border-color:var(--accent3);color:var(--text);}
+.rec-btn.active{background:rgba(57,255,20,0.08);border-color:var(--accent3);color:var(--accent3);}
+.rec-btn .rec-icon{font-size:1.4rem;display:block;margin-bottom:4px;}
+.rec-btn .rec-label{font-size:0.72rem;font-weight:600;}
+.rec-btn .rec-time{font-size:0.62rem;opacity:0.7;margin-top:2px;}
+.mobility-list{display:flex;flex-direction:column;gap:10px;}
+.mobility-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden;}
+.mobility-header{display:flex;align-items:center;gap:12px;padding:13px 14px;cursor:pointer;}
+.mob-order{font-family:'Bebas Neue',sans-serif;font-size:1.8rem;color:var(--border);min-width:36px;line-height:1;}
+.mob-info{flex:1;}
+.mob-name{font-weight:600;font-size:0.92rem;}
+.mob-target{font-size:0.72rem;color:var(--muted);margin-top:2px;}
+.mob-hockey{font-size:0.68rem;color:var(--accent3);margin-top:2px;font-style:italic;}
+.mob-duration{font-family:'Space Mono',monospace;font-size:0.8rem;color:var(--accent3);white-space:nowrap;}
+.mob-detail{display:none;padding:0 14px 14px;border-top:1px solid var(--border);}
+.mob-detail.open{display:block;}
+.mob-tip{margin-top:10px;background:rgba(57,255,20,0.05);border-left:3px solid var(--accent3);padding:9px 12px;border-radius:0 6px 6px 0;font-size:0.8rem;line-height:1.5;}
+.mob-timer-btn{display:inline-flex;align-items:center;gap:6px;background:rgba(57,255,20,0.1);border:1px solid rgba(57,255,20,0.3);color:var(--accent3);padding:6px 12px;border-radius:7px;cursor:pointer;font-size:0.73rem;font-family:'DM Sans',sans-serif;margin-top:10px;}
+
+/* ── MATCH MODE ── */
+.match-hero{background:linear-gradient(135deg,rgba(255,107,53,0.15),rgba(255,107,53,0.05));border:1px solid rgba(255,107,53,0.3);border-radius:14px;padding:20px;margin-bottom:16px;}
+.match-title{font-family:'Bebas Neue',sans-serif;font-size:1.8rem;letter-spacing:2px;color:var(--accent2);margin-bottom:6px;}
+.match-toggle{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px;}
+.match-mode-btn{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px;cursor:pointer;text-align:center;color:var(--muted);font-family:'DM Sans',sans-serif;transition:all 0.2s;}
+.match-mode-btn:hover{border-color:var(--accent2);color:var(--text);}
+.match-mode-btn.active{background:rgba(255,107,53,0.12);border-color:var(--accent2);color:var(--accent2);}
+.match-mode-btn .mm-icon{font-size:1.6rem;display:block;margin-bottom:5px;}
+.match-mode-btn .mm-label{font-size:0.8rem;font-weight:600;}
+.match-mode-btn .mm-sub{font-size:0.65rem;opacity:0.7;margin-top:2px;}
+.match-protocol{display:flex;flex-direction:column;gap:8px;}
+.protocol-step{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:13px 14px;display:flex;align-items:center;gap:12px;}
+.step-num{font-family:'Bebas Neue',sans-serif;font-size:1.6rem;color:var(--accent2);min-width:32px;line-height:1;}
+.step-info{flex:1;}
+.step-name{font-weight:600;font-size:0.9rem;}
+.step-detail{font-size:0.75rem;color:var(--muted);margin-top:2px;line-height:1.4;}
+.step-time{font-family:'Space Mono',monospace;font-size:0.8rem;color:var(--accent2);white-space:nowrap;}
+.protocol-timer-btn{display:inline-flex;align-items:center;gap:5px;background:rgba(255,107,53,0.1);border:1px solid rgba(255,107,53,0.3);color:var(--accent2);padding:5px 11px;border-radius:6px;cursor:pointer;font-size:0.72rem;font-family:'DM Sans',sans-serif;margin-top:6px;}
+
+/* CREATINE / TIPS */
+.creatine-banner{background:linear-gradient(135deg,rgba(57,255,20,0.08),rgba(57,255,20,0.03));border:1px solid rgba(57,255,20,0.25);border-radius:12px;padding:13px 15px;margin-top:16px;display:flex;align-items:center;gap:12px;}
+.creatine-icon{font-size:1.6rem;}
+.creatine-text{font-size:0.8rem;line-height:1.5;}
+.creatine-text b{color:var(--accent3);}
+.nutri-tips{display:flex;flex-direction:column;gap:7px;margin-top:16px;margin-bottom:24px;}
+.nutri-tip{display:flex;gap:10px;align-items:flex-start;background:var(--surface);border:1px solid var(--border);border-radius:9px;padding:11px 13px;font-size:0.8rem;color:var(--muted);line-height:1.5;}
+.tip-icon{font-size:1rem;flex-shrink:0;margin-top:1px;}
+
+/* MISC */
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.5;}}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+.pulse{animation:pulse 2s ease-in-out infinite;}
+.fade-in{animation:fadeIn 0.3s ease;}
+@media(max-width:600px){
+  .nutri-macros{grid-template-columns:repeat(2,1fr);}
+  .meal-day-selector{grid-template-columns:repeat(2,1fr);}
+  .tab-btn{font-size:0.75rem;letter-spacing:1px;padding:8px 2px;}
+}
+
+/* ══ FIORELLA THEME ══ */
+.fio-theme { --faccent:#22c55e; --faccent2:#a78bfa; --faccent3:#fb923c; }
+.profile-switcher{display:flex;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:4px;margin-bottom:14px;}
+.profile-btn{flex:1;padding:9px 6px;border:none;border-radius:7px;background:transparent;color:var(--muted);font-family:'Bebas Neue',sans-serif;font-size:0.95rem;letter-spacing:2px;cursor:pointer;transition:all 0.2s;}
+.profile-btn.active-nico{background:linear-gradient(135deg,rgba(0,212,255,0.18),rgba(255,107,53,0.08));color:var(--accent);border:1px solid rgba(0,212,255,0.25);}
+.profile-btn.active-fio{background:linear-gradient(135deg,rgba(244,114,182,0.18),rgba(167,139,250,0.08));color:#22c55e;border:1px solid rgba(244,114,182,0.25);}
+.fio-panel{display:none;}
+.fio-panel.active{display:block;animation:fadeIn 0.3s ease;}
+.nico-panel{display:block;}
+.nico-panel.hidden{display:none;}
+/* fio athlete card */
+.fio-athlete-card{margin:20px 0 0;background:var(--surface);border:1px solid rgba(34,197,94,0.25);border-radius:16px;padding:20px;display:grid;grid-template-columns:1fr auto;gap:16px;align-items:center;position:relative;overflow:hidden;}
+.fio-athlete-card::after{content:'🌸';position:absolute;right:110px;top:50%;transform:translateY(-50%);font-size:4.5rem;opacity:0.05;}
+.fio-name{font-family:'Bebas Neue',sans-serif;font-size:1.8rem;letter-spacing:2px;background:linear-gradient(135deg,#22c55e,#16a34a);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.fio-goal-box{text-align:center;background:linear-gradient(135deg,rgba(34,197,94,0.12),rgba(22,163,74,0.08));border:1px solid rgba(34,197,94,0.25);border-radius:12px;padding:14px 16px;min-width:100px;}
+.fio-goal-num{font-family:'Bebas Neue',sans-serif;font-size:2.2rem;line-height:1;background:linear-gradient(135deg,#22c55e,#16a34a);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.fio-goal-label{font-size:0.6rem;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-top:3px;}
+/* fio macros */
+.fio-macro-strip{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:12px 0 0;}
+.fio-macro-card{background:var(--surface);border:1px solid rgba(34,197,94,0.18);border-radius:10px;padding:10px;text-align:center;}
+/* fio tabs */
+.fio-tab-nav{display:flex;gap:4px;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:4px;margin:14px 0;}
+.fio-tab-btn{flex:1;padding:9px 4px;border:none;border-radius:8px;background:transparent;color:var(--muted);font-family:'Bebas Neue',sans-serif;font-size:0.88rem;letter-spacing:1.5px;cursor:pointer;transition:all 0.2s;white-space:nowrap;}
+.fio-tab-btn:hover{color:var(--text);}
+.fio-tab-btn.active{background:linear-gradient(135deg,rgba(34,197,94,0.15),rgba(22,163,74,0.08));color:#22c55e;border:1px solid rgba(34,197,94,0.25);}
+.fio-tab-panel{display:none;}
+.fio-tab-panel.active{display:block;animation:fadeIn 0.3s ease;}
+/* fio day selector */
+.fio-day-selector{display:grid;grid-template-columns:repeat(5,1fr);gap:7px;margin-bottom:14px;}
+.fio-day-btn{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:11px 5px;cursor:pointer;transition:all 0.2s;text-align:center;color:var(--muted);font-family:'DM Sans',sans-serif;}
+.fio-day-btn:hover{border-color:#22c55e;color:var(--text);}
+.fio-day-btn.active{background:linear-gradient(135deg,rgba(34,197,94,0.15),rgba(34,197,94,0.05));border-color:#22c55e;color:#22c55e;}
+.fio-day-btn .fdb-num{font-family:'Bebas Neue',sans-serif;font-size:1.4rem;letter-spacing:1px;display:block;line-height:1;}
+.fio-day-btn .fdb-label{font-size:0.62rem;text-transform:uppercase;letter-spacing:1px;margin-top:3px;}
+/* fio exercise cards */
+.fio-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden;transition:border-color 0.2s;cursor:pointer;margin-bottom:10px;}
+.fio-card:hover{border-color:rgba(34,197,94,0.35);}
+.fio-card.completed{border-color:rgba(34,197,94,0.5);background:rgba(34,197,94,0.03);}
+.fio-card-main{display:grid;grid-template-columns:44px 1fr auto;align-items:center;gap:12px;padding:13px 14px;}
+.fio-card-emoji{font-size:1.5rem;text-align:center;}
+.fio-card-name{font-weight:600;font-size:0.92rem;}
+.fio-card-muscles{font-size:0.72rem;color:var(--muted);margin-top:2px;}
+.fio-card-goal{font-size:0.68rem;color:#22c55e;margin-top:2px;font-style:italic;}
+.fio-card-sets{text-align:right;}
+.fio-sets-label{font-family:'Space Mono',monospace;font-size:0.85rem;color:#22c55e;font-weight:700;}
+.fio-rest-label{font-size:0.68rem;color:var(--muted);margin-top:2px;}
+.fio-card-detail{display:none;padding:0 14px 14px;border-top:1px solid var(--border);}
+.fio-card-detail.open{display:block;}
+.fio-tip{margin-top:12px;background:rgba(34,197,94,0.06);border-left:3px solid #22c55e;padding:9px 12px;border-radius:0 6px 6px 0;font-size:0.8rem;line-height:1.5;}
+.fio-set-tracker{display:flex;gap:7px;margin-top:10px;flex-wrap:wrap;}
+.fio-set-dot{width:34px;height:34px;border-radius:8px;border:1px solid var(--border);background:var(--surface2);cursor:pointer;display:flex;align-items:center;justify-content:center;font-family:'Space Mono',monospace;font-size:0.68rem;color:var(--muted);transition:all 0.15s;}
+.fio-set-dot.done{background:rgba(34,197,94,0.15);border-color:#22c55e;color:#22c55e;}
+.fio-timer-btn{display:inline-flex;align-items:center;gap:6px;background:rgba(34,197,94,0.08);border:1px solid rgba(34,197,94,0.3);color:#22c55e;padding:6px 12px;border-radius:7px;cursor:pointer;font-size:0.75rem;font-family:'DM Sans',sans-serif;margin-top:10px;}
+.fio-check-btn{background:none;border:1px solid var(--border);color:var(--muted);padding:6px 13px;border-radius:6px;cursor:pointer;font-size:0.75rem;font-family:'DM Sans',sans-serif;transition:all 0.2s;margin-top:10px;}
+.fio-check-btn:hover{border-color:#22c55e;color:#22c55e;}
+.fio-card.completed .fio-check-btn{background:rgba(34,197,94,0.1);border-color:#22c55e;color:#22c55e;}
+.fio-section-header{display:flex;align-items:center;gap:10px;margin:20px 0 10px;}
+.fio-section-title{font-family:'Bebas Neue',sans-serif;font-size:1.05rem;letter-spacing:2px;color:#22c55e;}
+.fio-progress-wrap{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:14px;}
+.fio-progress-top{display:flex;justify-content:space-between;margin-bottom:8px;font-size:0.78rem;color:var(--muted);}
+.fio-progress-track{height:5px;background:var(--surface2);border-radius:3px;overflow:hidden;}
+.fio-progress-fill{height:100%;background:linear-gradient(90deg,#22c55e,#16a34a);border-radius:3px;transition:width 0.4s ease;}
+.fio-superset-label{font-family:'Space Mono',monospace;font-size:0.62rem;color:#22c55e;text-transform:uppercase;letter-spacing:1px;padding:3px 9px;background:rgba(34,197,94,0.1);border-radius:4px;margin-bottom:5px;display:inline-block;}
+/* fio nutri */
+.fio-nutri-hero{background:linear-gradient(135deg,rgba(34,197,94,0.08),rgba(22,163,74,0.05));border:1px solid rgba(34,197,94,0.2);border-radius:14px;padding:20px;margin-bottom:14px;}
+.fio-meal-day-selector{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-bottom:14px;}
+.fio-meal-day-btn{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:10px 5px;cursor:pointer;text-align:center;color:var(--muted);font-family:'DM Sans',sans-serif;font-size:0.75rem;transition:all 0.2s;line-height:1.3;}
+.fio-meal-day-btn:hover{border-color:#22c55e;color:var(--text);}
+.fio-meal-day-btn.active{background:rgba(34,197,94,0.1);border-color:#22c55e;color:#22c55e;}
+.fio-meal-day-btn .fmdb-icon{font-size:1.2rem;display:block;margin-bottom:3px;}
+/* fio rpe */
+.fio-rpe-section{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px;margin-top:16px;}
+.fio-rpe-btn{width:36px;height:36px;border-radius:8px;border:1px solid var(--border);background:var(--surface2);color:var(--muted);cursor:pointer;font-family:'Space Mono',monospace;font-size:0.78rem;transition:all 0.15s;}
+.fio-rpe-btn.active{border-color:#22c55e;background:rgba(34,197,94,0.12);color:#22c55e;}
+/* fio progress weight */
+.fio-weight-track{background:var(--surface);border:1px solid rgba(167,139,250,0.25);border-radius:12px;padding:15px;margin-top:14px;}
+.fio-wt-title{font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:2px;color:#22c55e;margin-bottom:12px;}
+.fio-wt-log{display:flex;flex-direction:column;gap:8px;}
+.fio-wt-entry{display:flex;justify-content:space-between;align-items:center;padding:8px 12px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;}
+.fio-wt-date{font-family:'Space Mono',monospace;font-size:0.72rem;color:var(--muted);}
+.fio-wt-val{font-family:'Bebas Neue',sans-serif;font-size:1.3rem;color:#22c55e;}
+.fio-wt-input-row{display:flex;gap:8px;margin-bottom:12px;align-items:center;}
+.fio-wt-input{flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:'Space Mono',monospace;font-size:0.9rem;padding:9px 12px;-moz-appearance:textfield;}
+.fio-wt-input::-webkit-outer-spin-button,.fio-wt-input::-webkit-inner-spin-button{-webkit-appearance:none;}
+.fio-wt-input:focus{outline:none;border-color:#22c55e;}
+.fio-wt-save-btn{background:rgba(34,197,94,0.12);border:1px solid rgba(34,197,94,0.35);color:#22c55e;padding:9px 16px;border-radius:8px;cursor:pointer;font-size:0.8rem;font-family:'DM Sans',sans-serif;white-space:nowrap;}
+.fio-wt-chart{display:flex;align-items:flex-end;gap:5px;height:70px;margin-top:12px;padding-bottom:4px;}
+.fio-wt-bar-wrap{display:flex;flex-direction:column;align-items:center;gap:2px;flex:1;}
+.fio-wt-bar{background:linear-gradient(180deg,#22c55e,rgba(34,197,94,0.3));border-radius:3px 3px 0 0;width:100%;min-height:3px;transition:height 0.4s ease;}
+.fio-wt-bar-label{font-size:0.55rem;color:var(--muted);white-space:nowrap;}
+.fio-wt-bar-val{font-size:0.62rem;color:#22c55e;font-family:'Space Mono',monospace;}
+.fio-goal-bar-wrap{margin-top:12px;}
+.fio-goal-bar-label{display:flex;justify-content:space-between;font-size:0.72rem;color:var(--muted);margin-bottom:5px;}
+.fio-goal-bar-track{height:8px;background:var(--surface2);border-radius:4px;overflow:hidden;}
+.fio-goal-bar-fill{height:100%;background:linear-gradient(90deg,#22c55e,#16a34a);border-radius:4px;transition:width 0.5s ease;}
+
+/* ══ FIORELLA WHITE THEME ══ */
+#fioPanel {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 16px;
+  margin-top: 4px;
+}
+#fioPanel .fio-athlete-card { background: #f8fffe; border-color: rgba(34,197,94,0.25); }
+#fioPanel .fio-macro-card { background: #f0fdf4; border-color: rgba(34,197,94,0.2); }
+#fioPanel .fio-tab-nav { background: #f0fdf4; border-color: rgba(34,197,94,0.2); }
+#fioPanel .fio-tab-btn { color: #6b7280; }
+#fioPanel .fio-tab-btn:hover { color: #111827; }
+#fioPanel .fio-day-btn { background: #f8fafc; border-color: #e2e8f0; color: #6b7280; }
+#fioPanel .fio-card { background: #f8fafc; border-color: #e2e8f0; }
+#fioPanel .fio-card:hover { border-color: rgba(34,197,94,0.4); }
+#fioPanel .fio-card.completed { background: #f0fdf4; border-color: rgba(34,197,94,0.5); }
+#fioPanel .fio-card-name { color: #111827; }
+#fioPanel .fio-card-muscles { color: #6b7280; }
+#fioPanel .fio-card-detail { border-top-color: #e2e8f0; }
+#fioPanel .fio-set-dot { background: #f1f5f9; border-color: #e2e8f0; color: #9ca3af; }
+#fioPanel .fio-progress-wrap { background: #f8fafc; border-color: #e2e8f0; }
+#fioPanel .fio-progress-top { color: #6b7280; }
+#fioPanel .fio-progress-track { background: #e2e8f0; }
+#fioPanel .fio-rpe-section { background: #f8fafc; border-color: #e2e8f0; }
+#fioPanel .fio-rpe-btn { background: #f1f5f9; border-color: #e2e8f0; color: #6b7280; }
+#fioPanel .rpe-note { background: #f1f5f9; border-color: #e2e8f0; color: #111827; }
+#fioPanel .nutri-tip { background: #f8fafc; border-color: #e2e8f0; color: #6b7280; }
+#fioPanel .meal-block { background: #f8fafc; border-color: rgba(34,197,94,0.2); }
+#fioPanel .meal-block-header:hover { background: rgba(34,197,94,0.03); }
+#fioPanel .meal-time-badge { background: #f0fdf4; border-color: rgba(34,197,94,0.2); }
+#fioPanel .meal-name { color: #111827; }
+#fioPanel .meal-desc { color: #6b7280; }
+#fioPanel .meal-detail-body { border-top-color: #e2e8f0; }
+#fioPanel .meal-option { background: #f1f5f9; border-color: #e2e8f0; }
+#fioPanel .meal-option:hover { border-color: rgba(34,197,94,0.4); }
+#fioPanel .meal-option.selected { background: #f0fdf4; border-color: #22c55e; }
+#fioPanel .meal-option.selected::after { color: #22c55e; }
+#fioPanel .option-title { color: #111827; }
+#fioPanel .option-detail { color: #6b7280; }
+#fioPanel .opt-macro { border-color: #e2e8f0; color: #6b7280; }
+#fioPanel .opt-macro.prot { border-color: rgba(34,197,94,0.4); color: #16a34a; }
+#fioPanel .opt-macro.kcal { border-color: rgba(34,197,94,0.3); color: #22c55e; }
+#fioPanel .hydration-card { background: #f8fafc; border-color: rgba(34,197,94,0.2); }
+#fioPanel .hydration-title { color: #22c55e; }
+#fioPanel .water-glass { background: #f1f5f9; border-color: #e2e8f0; }
+#fioPanel .hydration-label { color: #6b7280; }
+#fioPanel .hydration-label span { color: #22c55e; }
+#fioPanel .fio-weight-track { background: #f8fafc; border-color: rgba(34,197,94,0.25); }
+#fioPanel .fio-wt-entry { background: #f0fdf4; border-color: #e2e8f0; }
+#fioPanel .fio-wt-date { color: #6b7280; }
+#fioPanel .fio-wt-input { background: #f1f5f9; border-color: #e2e8f0; color: #111827; }
+#fioPanel .fio-goal-bar-track { background: #e2e8f0; }
+#fioPanel .fio-goal-bar-label { color: #6b7280; }
+#fioPanel .mobility-card { background: #f8fafc; border-color: rgba(34,197,94,0.18); }
+#fioPanel .mob-name { color: #111827; }
+#fioPanel .mob-target { color: #6b7280; }
+#fioPanel .mob-detail { border-top-color: #e2e8f0; }
+#fioPanel .mob-tip { background: rgba(34,197,94,0.05); border-left-color: #22c55e; color: #374151; }
+#fioPanel .section-line { background: #e2e8f0; }
+#fioPanel .fio-section-header .section-line { background: #e2e8f0; }
+#fioPanel .finisher-item { background: rgba(34,197,94,0.04); color: #374151; }
+#fioPanel [style*="background:var(--surface2)"] { background: #f1f5f9 !important; }
+#fioPanel [style*="color:var(--muted)"] { color: #6b7280 !important; }
+#fioPanel [style*="border:1px solid var(--border)"] { border-color: #e2e8f0 !important; }
+</style>
+</head>
+<body>
+
+<!-- FLOATING REST TIMER -->
+<div class="floating-timer" id="floatingTimer">
+  <button class="ft-close" onclick="closeTimer()">✕</button>
+  <div class="ft-label">DESCANSO</div>
+  <div class="ft-time" id="ftDisplay">01:30</div>
+  <div class="ft-actions">
+    <button class="ft-btn" onclick="addTime(30)">+30s</button>
+    <button class="ft-btn" onclick="resetTimer()">↺</button>
+    <button class="ft-btn" onclick="closeTimer()">Skip</button>
+  </div>
+</div>
+
+<header>
+  <div class="container">
+    <div class="header-inner">
+      <div class="logo">🐷 LOS CHOCHANES</div>
+      <div class="today-badge">
+        <div>Hoy: <span id="todayName"></span></div>
+        <div id="currentDate"></div>
+      </div>
+    </div>
+    <div class="profile-switcher" style="margin-top:10px">
+      <button class="profile-btn active-nico" id="btnNico" onclick="switchProfile('nico')">🏒 NICOLÁS</button>
+      <button class="profile-btn" id="btnFio" onclick="switchProfile('fio')">🌸 FIORELLA</button>
+    </div>
+  </div>
+</header>
+
+<div class="container">
+
+  <!-- ══ NICOLÁS PANEL ══ -->
+  <div class="nico-panel" id="nicoPanel">
+  <!-- ATHLETE CARD -->
+  <div class="athlete-card">
+    <div>
+      <div class="athlete-name">NICOLÁS — ARG 🇦🇷</div>
+      <div class="athlete-meta">
+        <span class="meta-pill"><b>25</b> años</span>
+        <span class="meta-pill"><b>172</b> cm</span>
+        <span class="meta-pill"><b>70</b> kg</span>
+        <span class="meta-pill">15 años elite</span>
+        <span class="meta-pill">🧬 Creatina activa</span>
+      </div>
+    </div>
+    <div class="goal-countdown">
+      <div class="countdown-num" id="daysCount">—</div>
+      <div class="countdown-label">días para<br>Brasil 🇧🇷</div>
+    </div>
+  </div>
+
+  <!-- MACRO STRIP -->
+  <div class="macro-strip">
+    <div class="macro-card-sm"><div class="macro-val-sm" style="color:var(--accent)">2200</div><div class="macro-lbl-sm">kcal/día</div></div>
+    <div class="macro-card-sm"><div class="macro-val-sm" style="color:var(--accent2)">120g</div><div class="macro-lbl-sm">proteína</div></div>
+    <div class="macro-card-sm"><div class="macro-val-sm" style="color:var(--accent3)">5g</div><div class="macro-lbl-sm">creatina</div></div>
+  </div>
+
+  <!-- TABS -->
+  <div class="tab-nav">
+    <button class="tab-btn active" onclick="switchTab('entreno',this)">🏋️ ENTRENO</button>
+    <button class="tab-btn" onclick="switchTab('nutricion',this)">🍗 NUTRICIÓN</button>
+    <button class="tab-btn" onclick="switchTab('recovery',this)">🧘 RECOVERY</button>
+    <button class="tab-btn" onclick="switchTab('partido',this)">🏒 PARTIDO</button>
+  </div>
+
+  <!-- ══════════════════════════════════════════ -->
+  <!-- TAB: ENTRENO                              -->
+  <!-- ══════════════════════════════════════════ -->
+  <div class="tab-panel active" id="tab-entreno">
+    <div class="day-selector" id="daySelector"></div>
+    <div class="progress-bar-wrap">
+      <div class="progress-top"><span>Progreso del entreno</span><span id="progressText">0 / 0</span></div>
+      <div class="progress-track"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+    </div>
+    <div id="workoutContent" class="fade-in"></div>
+  </div>
+
+  <!-- ══════════════════════════════════════════ -->
+  <!-- TAB: NUTRICIÓN                            -->
+  <!-- ══════════════════════════════════════════ -->
+  <div class="tab-panel" id="tab-nutricion">
+    <div class="nutri-hero">
+      <div class="nutri-hero-title">🍗 PLAN NUTRICIONAL</div>
+      <div class="nutri-hero-sub">Sin verduras, sin ultraprocesados. Sin proteína en polvo. Objetivo real: <b style="color:var(--text)">120g de proteína por día</b> con comida real. Adaptado a cada tipo de día.</div>
+      <div class="nutri-macros">
+        <div class="nmacro"><div class="nmacro-val" style="color:var(--accent)">2200</div><div class="nmacro-lbl">kcal entreno</div></div>
+        <div class="nmacro"><div class="nmacro-val" style="color:var(--accent2)">120g</div><div class="nmacro-lbl">proteína</div></div>
+        <div class="nmacro"><div class="nmacro-val" style="color:#a78bfa">220g</div><div class="nmacro-lbl">carbos</div></div>
+        <div class="nmacro"><div class="nmacro-val" style="color:var(--accent3)">65g</div><div class="nmacro-lbl">grasas</div></div>
+      </div>
+    </div>
+
+    <!-- HYDRATION TRACKER -->
+    <div class="hydration-card">
+      <div class="hydration-title">💧 HIDRATACIÓN DEL DÍA</div>
+      <div class="hydration-track" id="waterTrack"></div>
+      <div class="hydration-label">Vasos tomados: <span id="waterCount">0</span> / 10 &nbsp;·&nbsp; ~<span id="waterMl">0</span> ml</div>
+    </div>
+
+    <div style="margin-top:16px;">
+      <div class="meal-day-selector" id="mealDaySelector"></div>
+      <div id="mealContent" class="fade-in"></div>
+    </div>
+
+    <div class="creatine-banner" style="margin-top:16px;">
+      <div class="creatine-icon">🧬</div>
+      <div class="creatine-text"><b>Creatina 5g</b> — con desayuno o post-entreno con carbo simple. Consistencia &gt; timing. 2.5–3L de agua/día con creatina activa.</div>
+    </div>
+    <div class="nutri-tips">
+      <div class="nutri-tip"><span class="tip-icon">🍺</span><span>El alcohol frena la síntesis proteica hasta 36hs. Si salís, entrenás antes, no el día siguiente.</span></div>
+      <div class="nutri-tip"><span class="tip-icon">🌙</span><span>Proteína antes de dormir (huevos, queso cottage) mejora la recuperación nocturna.</span></div>
+      <div class="nutri-tip"><span class="tip-icon">🔁</span><span>Rotá entre opciones para no aburrirte. Todas tienen el mismo aporte calculado.</span></div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════ -->
+  <!-- TAB: RECOVERY                             -->
+  <!-- ══════════════════════════════════════════ -->
+  <div class="tab-panel" id="tab-recovery">
+    <div class="recovery-hero">
+      <div class="recovery-title">🧘 MOVILIDAD & RECOVERY</div>
+      <div class="recovery-sub">Rutinas específicas para hockey. La movilidad es tu ventaja silenciosa — mejora la patinada, previene lesiones y acelera la recuperación. Hacé estas rutinas los días de descanso o antes de dormir.</div>
+    </div>
+    <div class="recovery-selector">
+      <div class="rec-btn active" onclick="selectRecovery('cadera',this)"><span class="rec-icon">🦵</span><span class="rec-label">Cadera</span><span class="rec-time">12 min</span></div>
+      <div class="rec-btn" onclick="selectRecovery('hombros',this)"><span class="rec-icon">💪</span><span class="rec-label">Hombros</span><span class="rec-time">10 min</span></div>
+      <div class="rec-btn" onclick="selectRecovery('full',this)"><span class="rec-icon">🔄</span><span class="rec-label">Full Body</span><span class="rec-time">20 min</span></div>
+    </div>
+    <div class="mobility-list" id="mobilityContent"></div>
+  </div>
+
+  <!-- ══════════════════════════════════════════ -->
+  <!-- TAB: PARTIDO                              -->
+  <!-- ══════════════════════════════════════════ -->
+  <div class="tab-panel" id="tab-partido">
+    <div class="match-hero">
+      <div class="match-title">🏒 MODO PARTIDO</div>
+      <div style="font-size:0.82rem;color:var(--muted);line-height:1.5;">Protocolo específico para días de competencia. Pre-partido para activar el SNC sin agotar el músculo. Post-partido para recuperar rápido y estar listo en 48hs.</div>
+    </div>
+    <div class="match-toggle">
+      <div class="match-mode-btn active" onclick="selectMatchMode('pre',this)"><span class="mm-icon">⚡</span><span class="mm-label">PRE-PARTIDO</span><span class="mm-sub">Activación 45 min antes</span></div>
+      <div class="match-mode-btn" onclick="selectMatchMode('post',this)"><span class="mm-icon">🔋</span><span class="mm-label">POST-PARTIDO</span><span class="mm-sub">Recuperación inmediata</span></div>
+    </div>
+    <div id="matchContent"></div>
+  </div>
+
+</div><!-- /container -->
+  </div><!-- /nicoPanel -->
+
+  <!-- ══════════════════════════════════════════════════════════════ -->
+  <!-- FIORELLA PANEL                                                -->
+  <!-- ══════════════════════════════════════════════════════════════ -->
+  <div class="fio-panel" id="fioPanel">
+
+    <!-- FIO ATHLETE CARD -->
+    <div class="fio-athlete-card">
+      <div>
+        <div class="fio-name">FIORELLA 🐷</div>
+        <div class="athlete-meta">
+          <span class="meta-pill"><b>24</b> años</span>
+          <span class="meta-pill"><b>66</b> kg actual</span>
+          <span class="meta-pill">🎯 Meta: <b>59-60 kg</b></span>
+          <span class="meta-pill">Funcional + Gym</span>
+        </div>
+      </div>
+      <div class="fio-goal-box">
+        <div class="fio-goal-num" id="fioKgToGo">—</div>
+        <div class="fio-goal-label">kg para<br>la meta 🎯</div>
+      </div>
+    </div>
+
+    <!-- FIO MACROS -->
+    <div class="fio-macro-strip">
+      <div class="fio-macro-card"><div class="macro-val-sm" style="color:#22c55e">1650</div><div class="macro-lbl-sm">kcal/día</div></div>
+      <div class="fio-macro-card"><div class="macro-val-sm" style="color:#a78bfa">105g</div><div class="macro-lbl-sm">proteína</div></div>
+      <div class="fio-macro-card"><div class="macro-val-sm" style="color:#fb923c">-350</div><div class="macro-lbl-sm">déficit kcal</div></div>
+    </div>
+
+    <!-- FIO TABS -->
+    <div class="fio-tab-nav">
+      <button class="fio-tab-btn active" onclick="fioSwitchTab('entreno',this)">🏋️ ENTRENO</button>
+      <button class="fio-tab-btn" onclick="fioSwitchTab('nutricion',this)">🥗 NUTRICIÓN</button>
+      <button class="fio-tab-btn" onclick="fioSwitchTab('progreso',this)">📊 PROGRESO</button>
+      <button class="fio-tab-btn" onclick="fioSwitchTab('recovery',this)">🧘 RECOVERY</button>
+    </div>
+
+    <!-- ── FIO TAB: ENTRENO ── -->
+    <div class="fio-tab-panel active" id="fio-tab-entreno">
+      <div class="fio-day-selector" id="fioDaySelector"></div>
+      <div class="fio-progress-wrap">
+        <div class="fio-progress-top"><span>Progreso del entreno</span><span id="fioProgressText">0 / 0</span></div>
+        <div class="fio-progress-track"><div class="fio-progress-fill" id="fioProgressFill" style="width:0%"></div></div>
+      </div>
+      <div id="fioWorkoutContent" class="fade-in"></div>
+    </div>
+
+    <!-- ── FIO TAB: NUTRICIÓN ── -->
+    <div class="fio-tab-panel" id="fio-tab-nutricion">
+      <div class="fio-nutri-hero">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:1.6rem;letter-spacing:2px;margin-bottom:5px">🥗 PLAN NUTRICIONAL</div>
+        <div style="font-size:0.8rem;color:var(--muted);line-height:1.5">Déficit moderado para perder grasa sin perder músculo. Proteína alta para tonificar. Come de todo — sin restricciones extremas.</div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:14px">
+          <div class="nmacro"><div class="nmacro-val" style="color:#22c55e">1650</div><div class="nmacro-lbl">kcal/día</div></div>
+          <div class="nmacro"><div class="nmacro-val" style="color:#a78bfa">105g</div><div class="nmacro-lbl">proteína</div></div>
+          <div class="nmacro"><div class="nmacro-val" style="color:#fb923c">150g</div><div class="nmacro-lbl">carbos</div></div>
+        </div>
+      </div>
+      <!-- Hydration -->
+      <div class="hydration-card" style="border-color:rgba(244,114,182,0.2)">
+        <div class="hydration-title" style="color:#22c55e">💧 HIDRATACIÓN</div>
+        <div class="hydration-track" id="fioWaterTrack"></div>
+        <div class="hydration-label">Vasos tomados: <span id="fioWaterCount">0</span> / 8 &nbsp;·&nbsp; ~<span id="fioWaterMl">0</span> ml</div>
+      </div>
+      <div style="margin-top:14px">
+        <div class="fio-meal-day-selector" id="fioMealDaySelector"></div>
+        <div id="fioMealContent" class="fade-in"></div>
+      </div>
+      <div class="nutri-tips" style="margin-top:14px">
+        <div class="nutri-tip"><span class="tip-icon">🥩</span><span>Proteína en cada comida — es lo que frena la pérdida de músculo mientras bajás grasa.</span></div>
+        <div class="nutri-tip"><span class="tip-icon">🌙</span><span>Cenás liviano. Los carbos altos al mediodía, no a la noche.</span></div>
+        <div class="nutri-tip"><span class="tip-icon">🍫</span><span>Un permitido por semana está bien. No arruina nada, siempre que los otros 6 días sean consistentes.</span></div>
+        <div class="nutri-tip"><span class="tip-icon">💧</span><span>Hidratación clave para reducir retención de líquidos — que afecta mucho la zona media.</span></div>
+      </div>
+    </div>
+
+    <!-- ── FIO TAB: PROGRESO ── -->
+    <div class="fio-tab-panel" id="fio-tab-progreso">
+      <div class="fio-weight-track">
+        <div class="fio-wt-title">⚖️ REGISTRO DE PESO</div>
+        <div class="fio-wt-input-row">
+          <input class="fio-wt-input" type="number" id="fioWeightInput" placeholder="Ej: 65.2" min="40" max="120" step="0.1">
+          <button class="fio-wt-save-btn" onclick="saveFioWeight()">Guardar hoy</button>
+        </div>
+        <div class="fio-goal-bar-wrap">
+          <div class="fio-goal-bar-label"><span>Peso actual</span><span id="fioGoalBarLabel">66 kg → meta 59 kg</span></div>
+          <div class="fio-goal-bar-track"><div class="fio-goal-bar-fill" id="fioGoalBarFill" style="width:0%"></div></div>
+        </div>
+        <div class="fio-wt-chart" id="fioWtChart" style="margin-top:16px"></div>
+        <div class="fio-wt-log" id="fioWtLog" style="margin-top:12px"></div>
+      </div>
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px;margin-top:14px">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:2px;margin-bottom:12px;color:#a78bfa">📏 MEDIDAS (opcional)</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+          <div>
+            <div style="font-size:0.7rem;color:var(--muted);margin-bottom:5px;text-transform:uppercase;letter-spacing:1px">Cintura (cm)</div>
+            <input class="fio-wt-input" type="number" id="fioCintura" placeholder="Ej: 72" min="50" max="120" step="0.5" onchange="saveFioMedidas()">
+          </div>
+          <div>
+            <div style="font-size:0.7rem;color:var(--muted);margin-bottom:5px;text-transform:uppercase;letter-spacing:1px">Cadera (cm)</div>
+            <input class="fio-wt-input" type="number" id="fioCadera" placeholder="Ej: 96" min="60" max="130" step="0.5" onchange="saveFioMedidas()">
+          </div>
+          <div>
+            <div style="font-size:0.7rem;color:var(--muted);margin-bottom:5px;text-transform:uppercase;letter-spacing:1px">Glúteo (cm)</div>
+            <input class="fio-wt-input" type="number" id="fioGluteo" placeholder="Ej: 98" min="60" max="140" step="0.5" onchange="saveFioMedidas()">
+          </div>
+          <div>
+            <div style="font-size:0.7rem;color:var(--muted);margin-bottom:5px;text-transform:uppercase;letter-spacing:1px">Brazo (cm)</div>
+            <input class="fio-wt-input" type="number" id="fioBrazo" placeholder="Ej: 28" min="15" max="50" step="0.5" onchange="saveFioMedidas()">
+          </div>
+        </div>
+        <div style="font-size:0.72rem;color:var(--muted);margin-top:10px;line-height:1.5">💡 Las medidas muestran progreso cuando la balanza no se mueve — especialmente útil cuando ganás músculo y perdés grasa al mismo tiempo.</div>
+      </div>
+    </div>
+
+    <!-- ── FIO TAB: RECOVERY ── -->
+    <div class="fio-tab-panel" id="fio-tab-recovery">
+      <div style="background:linear-gradient(135deg,rgba(244,114,182,0.08),rgba(167,139,250,0.05));border:1px solid rgba(244,114,182,0.2);border-radius:14px;padding:18px;margin-bottom:14px">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:1.6rem;letter-spacing:2px;color:#22c55e;margin-bottom:6px">🧘 RECOVERY & MOVILIDAD</div>
+        <div style="font-size:0.8rem;color:var(--muted);line-height:1.5">Pilates, stretching y movilidad. Hacé estas rutinas los días de descanso o antes de dormir. El recovery es parte del entrenamiento.</div>
+      </div>
+      <div class="recovery-selector">
+        <div class="rec-btn active" onclick="selectFioRecovery('pilates',this)"><span class="rec-icon">🧘</span><span class="rec-label">Pilates</span><span class="rec-time">20 min</span></div>
+        <div class="rec-btn" onclick="selectFioRecovery('stretching',this)"><span class="rec-icon">🌸</span><span class="rec-label">Stretching</span><span class="rec-time">15 min</span></div>
+        <div class="rec-btn" onclick="selectFioRecovery('core',this)"><span class="rec-icon">🔥</span><span class="rec-label">Core suave</span><span class="rec-time">12 min</span></div>
+      </div>
+      <div id="fioRecoveryContent"></div>
+    </div>
+
+  </div><!-- /fioPanel -->
+
+
+
+<script>
+// ══════════════════════════════════════════════════════════════════
+// DATA
+// ══════════════════════════════════════════════════════════════════
+const WORKOUTS = {
+  1:{title:"POTENCIA DE PIERNAS",subtitle:"Fuerza explosiva para patinada + arranques rápidos",tag:"FUERZA / EXPLOSIVIDAD",duration:"65-75 min",
+    warmup:[
+      {name:"Jump Rope (saltar la soga)",duration:"3 min",muscles:"Calentamiento cardiovascular",hockey:"Coordinación pies-manos, ritmo de patinada"},
+      {name:"Inchworm + Hip Opener",duration:"8 reps",muscles:"Cadena posterior, cadera",hockey:"Movilidad para posición de hockey"},
+      {name:"Lateral Shuffle Bounds",duration:"2 × 15m",muscles:"Glúteos, aductores",hockey:"Patrón de movimiento lateral específico"}
+    ],
+    main:[
+      {superset:false,exercises:[
+        {name:"Box Jump",sets:"4 × 8",rest:90,restLabel:"90s",muscles:"Cuádriceps, glúteos, pantorrillas",hockey:"Explosividad en arranques",tip:"Caída suave y controlada. Baja caminando. Máxima potencia en cada salto.",video:"https://www.youtube.com/results?search_query=box+jump+crossfit+form",emoji:"📦",img:"https://upload.wikimedia.org/wikipedia/commons/thumb/2/29/Box_jump.jpg/640px-Box_jump.jpg"}
+      ]},
+      {superset:true,label:"SUPERSET A",exercises:[
+        {name:"Goblet Squat con Kettlebell",sets:"4 × 12",rest:0,restLabel:"—",muscles:"Cuádriceps, glúteos, core",hockey:"Posición base del hockey",tip:"Rodillas siguiendo la punta del pie. Pecho alto, core activado.",video:"https://www.youtube.com/results?search_query=goblet+squat+form",emoji:"🏋️",img:"https://upload.wikimedia.org/wikipedia/commons/thumb/4/4b/Kettlebell_goblet_squat.jpg/640px-Kettlebell_goblet_squat.jpg"},
+        {name:"Romanian Deadlift (RDL)",sets:"4 × 10",rest:75,restLabel:"75s",muscles:"Isquiotibiales, glúteos, espalda baja",hockey:"Cadena posterior para potencia de patinada",tip:"Bisagra de cadera perfecta. Barra pegada a las piernas. Sentir elongación en isquios.",video:"https://www.youtube.com/results?search_query=romanian+deadlift+form",emoji:"🎯",img:"https://upload.wikimedia.org/wikipedia/commons/thumb/8/80/Romanian_Deadlift.jpg/640px-Romanian_Deadlift.jpg"}
+      ]},
+      {superset:false,exercises:[
+        {name:"Bulgarian Split Squat",sets:"3 × 10 c/lado",rest:60,restLabel:"60s",muscles:"Cuádriceps, glúteos, estabilizadores",hockey:"Fuerza unilateral, corrección de desequilibrios",tip:"Rodilla trasera baja sin tocar el piso. Tronco ligeramente inclinado al frente.",video:"https://www.youtube.com/results?search_query=bulgarian+split+squat+form",emoji:"🦵",img:"https://upload.wikimedia.org/wikipedia/commons/thumb/9/9c/Split_squat_2.jpg/640px-Split_squat_2.jpg"}
+      ]},
+      {superset:true,label:"SUPERSET B — POTENCIA",exercises:[
+        {name:"Lateral Bound (salto lateral)",sets:"4 × 6 c/lado",rest:0,restLabel:"—",muscles:"Glúteos, aductores, cuádriceps",hockey:"Simula el impulso lateral del patinaje",tip:"Caída en un solo pie, absorber el impacto. Máxima distancia.",video:"https://www.youtube.com/results?search_query=lateral+bound+plyometric",emoji:"⚡",img:"https://upload.wikimedia.org/wikipedia/commons/thumb/5/5c/Plyometric_lateral_bound.jpg/640px-Plyometric_lateral_bound.jpg"},
+        {name:"Sled Push / Farmer Carry",sets:"4 × 20m",rest:90,restLabel:"90s",muscles:"Todo el cuerpo, enfoque piernas",hockey:"Potencia de empuje, resistencia específica",tip:"Si no hay sled: cargá dos kettlebells pesadas 20m. Postura baja.",video:"https://www.youtube.com/results?search_query=sled+push+crossfit",emoji:"🚀",img:"https://upload.wikimedia.org/wikipedia/commons/thumb/b/b2/Sled_push_exercise.jpg/640px-Sled_push_exercise.jpg"}
+      ]}
+    ],
+    finisher:[{name:"Tabata Bike / Remo ergométrico",detail:"8 rondas × 20s all-out / 10s descanso",time:"4 min"},{name:"Estiramiento isquiotibiales + cadera",detail:"Pigeon pose, figura 4",time:"5 min"}]
+  },
+  2:{title:"TREN SUPERIOR + CORE",subtitle:"Potencia de stick, protección de disco, estabilidad",tag:"FUERZA / CORE",duration:"60-70 min",
+    warmup:[
+      {name:"Band Pull-Aparts",duration:"3 × 15",muscles:"Hombros, manguito",hockey:"Prevención lesiones hombro"},
+      {name:"Bear Crawl",duration:"2 × 15m ida y vuelta",muscles:"Hombros, core, cadera",hockey:"Estabilidad de cadera y hombros"},
+      {name:"Thoracic Rotation (foam roller)",duration:"10 c/lado",muscles:"Columna torácica",hockey:"Rotación para el shot y defensa"}
+    ],
+    main:[
+      {superset:true,label:"SUPERSET A — EMPUJE / TIRÓN",exercises:[
+        {name:"Push-Up con Anillas",sets:"4 × 12-15",rest:0,restLabel:"—",muscles:"Pecho, tríceps, serrato, core",hockey:"Fuerza de empuje y estabilidad",tip:"Si tenés anillas en crossfit úsalas. Core rígido todo el tiempo.",video:"https://www.youtube.com/results?search_query=ring+push+up+form",emoji:"💪",img:"https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/Ring_push_up.jpg/640px-Ring_push_up.jpg"},
+        {name:"Remo con mancuerna 1 brazo",sets:"4 × 10 c/lado",rest:60,restLabel:"60s",muscles:"Espalda media, bíceps, core",hockey:"Jalar el stick, proteger disco",tip:"Codo pegado al cuerpo. Espalda paralela al piso. No rotar el torso.",video:"https://www.youtube.com/results?search_query=single+arm+dumbbell+row",emoji:"🎯",img:"https://upload.wikimedia.org/wikipedia/commons/thumb/2/2e/Dumbbell_row.jpg/640px-Dumbbell_row.jpg"}
+      ]},
+      {superset:true,label:"SUPERSET B — HOMBROS / PULL",exercises:[
+        {name:"Arnold Press con mancuernas",sets:"3 × 12",rest:0,restLabel:"—",muscles:"Deltoides completo, rotadores",hockey:"Potencia de shot y lanzamiento",tip:"Control en la fase de rotación. No hiperextender la zona lumbar.",video:"https://www.youtube.com/results?search_query=arnold+press+form",emoji:"🏆",img:"https://upload.wikimedia.org/wikipedia/commons/thumb/6/66/Arnold_press.jpg/640px-Arnold_press.jpg"},
+        {name:"Pull-Up / Dominadas",sets:"3 × 8-10",rest:75,restLabel:"75s",muscles:"Dorsal, bíceps, core",hockey:"Fuerza relativa al peso corporal",tip:"Escápulas hacia abajo y adentro al subir. Bajar controlado.",video:"https://www.youtube.com/results?search_query=pull+up+form+crossfit",emoji:"⬆️",img:"https://upload.wikimedia.org/wikipedia/commons/thumb/3/thirty/Pull_up_exercise.jpg/640px-Pull_up_exercise.jpg"}
+      ]},
+      {superset:false,exercises:[
+        {name:"Pallof Press (anti-rotación)",sets:"3 × 12 c/lado",rest:45,restLabel:"45s",muscles:"Core transverso, oblicuos",hockey:"Estabilidad al recibir contacto",tip:"Polea a altura de pecho. Extender brazos sin rotar. Respirar.",video:"https://www.youtube.com/results?search_query=pallof+press+cable",emoji:"🛡️",img:"https://upload.wikimedia.org/wikipedia/commons/thumb/8/8f/Pallof_press.jpg/640px-Pallof_press.jpg"}
+      ]},
+      {superset:true,label:"CIRCUITO CORE HOCKEY",exercises:[
+        {name:"Ab Wheel Rollout",sets:"3 × 10",rest:0,restLabel:"—",muscles:"Core completo, dorsal",hockey:"Estabilidad lumbar en posición agachada",tip:"Columna neutra. No dejar caer la cadera.",video:"https://www.youtube.com/results?search_query=ab+wheel+rollout+form",emoji:"⚙️",img:"https://upload.wikimedia.org/wikipedia/commons/thumb/1/1e/Ab_wheel_rollout.jpg/640px-Ab_wheel_rollout.jpg"},
+        {name:"Russian Twist con medicine ball",sets:"3 × 20",rest:0,restLabel:"—",muscles:"Oblicuos, rotadores",hockey:"Rotación de tronco para shots",tip:"Pies levantados para más dificultad.",video:"https://www.youtube.com/results?search_query=russian+twist+medicine+ball",emoji:"🌀",img:"https://upload.wikimedia.org/wikipedia/commons/thumb/c/c3/Russian_twist.jpg/640px-Russian_twist.jpg"},
+        {name:"Hollow Body Hold",sets:"3 × 30s",rest:45,restLabel:"45s",muscles:"Core anterior, psoas",hockey:"Base de todo el movimiento",tip:"Zona lumbar pegada al piso siempre.",video:"https://www.youtube.com/results?search_query=hollow+body+hold+form",emoji:"🧘",img:"https://upload.wikimedia.org/wikipedia/commons/thumb/f/f9/Hollow_body_hold.jpg/640px-Hollow_body_hold.jpg"}
+      ]}
+    ],
+    finisher:[{name:"EMOM 8 minutos",detail:"Min 1: 15 push-ups / Min 2: 10 pull-ups",time:"8 min"},{name:"Foam Rolling hombros + espalda alta",detail:"",time:"5 min"}]
+  },
+  3:{title:"VELOCIDAD + AGILIDAD",subtitle:"Aceleración, cambios de dirección, potencia reactiva",tag:"VELOCIDAD / ESPECIFICIDAD",duration:"60 min",
+    warmup:[
+      {name:"A-Skips + B-Skips",duration:"2 × 20m",muscles:"Patrón de carrera, cadera",hockey:"Ciclo de zancada/patinada"},
+      {name:"High Knees + Butt Kicks",duration:"2 × 20m",muscles:"Cadera flexores, isquios",hockey:"Cadencia de movimiento"},
+      {name:"Agility Ladder",duration:"5 min variaciones",muscles:"Pies, coordinación",hockey:"Patrones de paso de hockey"}
+    ],
+    main:[
+      {superset:false,exercises:[
+        {name:"Sprint 10m × 8 repeticiones",sets:"8 × 10m",rest:60,restLabel:"60s",muscles:"Cuádriceps, glúteos, pantorrillas",hockey:"Aceleración inicial — los primeros 5 pasos son clave",tip:"Salida desde posición baja similar a hockey. 100% intensidad cada vez.",video:"https://www.youtube.com/results?search_query=10m+acceleration+sprint+technique",emoji:"💨",img:"https://upload.wikimedia.org/wikipedia/commons/thumb/8/8f/Sprint_start.jpg/640px-Sprint_start.jpg"}
+      ]},
+      {superset:false,exercises:[
+        {name:"Cone Drill T-Test",sets:"5 × circuito",rest:90,restLabel:"90s",muscles:"Todo tren inferior, reactividad",hockey:"Cambios de dirección 90° y 45° como en juego",tip:"Conos en T: 10m adelante, 5m lateral izq, 10m lateral der, 5m regreso. Medí el tiempo.",video:"https://www.youtube.com/results?search_query=t+test+agility+drill",emoji:"🔄",img:"https://upload.wikimedia.org/wikipedia/commons/thumb/a/a8/T_test_agility.jpg/640px-T_test_agility.jpg"}
+      ]},
+      {superset:true,label:"POTENCIA REACTIVA",exercises:[
+        {name:"Depth Drop + Salto lateral",sets:"4 × 6",rest:0,restLabel:"—",muscles:"Pantorrillas, reactivo, SNC",hockey:"Reacción explosiva, change of direction",tip:"Caer → tocar el piso → saltar lateralmente de inmediato. Tiempo de contacto mínimo.",video:"https://www.youtube.com/results?search_query=depth+drop+lateral+jump",emoji:"⚡",img:"https://upload.wikimedia.org/wikipedia/commons/thumb/7/7e/Depth_jump.jpg/640px-Depth_jump.jpg"},
+        {name:"Broad Jump (salto horizontal)",sets:"4 × 5",rest:90,restLabel:"90s",muscles:"Cadena posterior completa",hockey:"Longitud de zancada, potencia lineal",tip:"Brazos atrás y adelante para impulso. Máxima distancia. Anotá tu marca.",video:"https://www.youtube.com/results?search_query=broad+jump+form",emoji:"🦘",img:"https://upload.wikimedia.org/wikipedia/commons/thumb/b/b4/Standing_broad_jump.jpg/640px-Standing_broad_jump.jpg"}
+      ]},
+      {superset:false,exercises:[
+        {name:"Shuttle Run 5-10-5",sets:"6 repeticiones",rest:75,restLabel:"75s",muscles:"Todo tren inferior, frenada y arranque",hockey:"El drill más específico: frenada y arranque explosivo",tip:"5m izq, 10m der, 5m centro. Tocá la línea con la mano. Medí el tiempo siempre.",video:"https://www.youtube.com/results?search_query=5+10+5+pro+agility+drill",emoji:"🏃",img:"https://upload.wikimedia.org/wikipedia/commons/thumb/6/6d/Shuttle_run_agility.jpg/640px-Shuttle_run_agility.jpg"}
+      ]}
+    ],
+    finisher:[{name:"Aerobic Cool-Down Run / Bike",detail:"Trote suave o bicicleta fácil",time:"8 min"},{name:"Estiramiento dinámico completo",detail:"Cadera, cuádriceps, isquios, gemelos",time:"7 min"}]
+  },
+  4:{title:"FUERZA FUNCIONAL + RESISTENCIA",subtitle:"Circuito metabólico — Potencia aeróbica + cuerpo completo",tag:"METABÓLICO / RESISTENCIA",duration:"55-65 min",
+    warmup:[
+      {name:"Assault Bike / Remo fácil",duration:"4 min suave",muscles:"Cuerpo completo, cardiovascular",hockey:"Base aeróbica para el entreno"},
+      {name:"World's Greatest Stretch",duration:"5 c/lado",muscles:"Cadera, torácica, isquios",hockey:"Movilidad funcional completa"},
+      {name:"Band Monster Walk lateral",duration:"2 × 15 pasos",muscles:"Glúteos medios, abductores",hockey:"Activación glúteos"}
+    ],
+    main:[
+      {superset:false,exercises:[
+        {name:"CIRCUITO HOCKEY CONDITIONING",sets:"4 rondas",rest:120,restLabel:"2 min entre rondas",muscles:"Cuerpo completo",hockey:"Demanda cardiovascular de un cuarto de 15 min",tip:"10 Thrusters | 10 Pull-Ups | 15 Box Steps | 200m Row/Bike. Sin pausa dentro de la ronda.",video:"https://www.youtube.com/results?search_query=crossfit+conditioning+circuit",emoji:"🔥",img:"https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/Thruster_crossfit.jpg/640px-Thruster_crossfit.jpg"}
+      ]},
+      {superset:true,label:"FUERZA CUERPO COMPLETO",exercises:[
+        {name:"Kettlebell Swing Ruso",sets:"4 × 15",rest:0,restLabel:"—",muscles:"Glúteos, isquios, core, hombros",hockey:"Bisagra de cadera = potencia de patinada",tip:"Snap de cadera potente. La kettlebell flota, no la levantás con los brazos.",video:"https://www.youtube.com/results?search_query=russian+kettlebell+swing+form",emoji:"⚙️",img:"https://upload.wikimedia.org/wikipedia/commons/thumb/c/c3/Kettlebell_swing.jpg/640px-Kettlebell_swing.jpg"},
+        {name:"Dip en paralelas",sets:"4 × 12",rest:60,restLabel:"60s",muscles:"Tríceps, pecho, hombros anteriores",hockey:"Empuje de stick, cargar al rival",tip:"Bajar hasta 90° en codo. No dejar caer los hombros. Cuerpo vertical.",video:"https://www.youtube.com/results?search_query=parallel+bar+dips+form",emoji:"💪",img:"https://upload.wikimedia.org/wikipedia/commons/thumb/1/15/Parallel_bar_dips.jpg/640px-Parallel_bar_dips.jpg"}
+      ]},
+      {superset:false,exercises:[
+        {name:"Farmers Carry pesado",sets:"4 × 30m",rest:75,restLabel:"75s",muscles:"Trapecios, grip, core, piernas",hockey:"Estabilidad de hombros bajo fatiga",tip:"Hombros atrás y abajo. Lo más pesado que puedas mantener la postura.",video:"https://www.youtube.com/results?search_query=farmer+carry+form",emoji:"🏋️",img:"https://upload.wikimedia.org/wikipedia/commons/thumb/a/a0/Farmer_carry_exercise.jpg/640px-Farmer_carry_exercise.jpg"}
+      ]},
+      {superset:false,exercises:[
+        {name:"AMRAP 10 minutos",sets:"Máximas rondas",rest:0,restLabel:"solo lo necesario",muscles:"Cuerpo completo, cardio",hockey:"Intensidad en últimos minutos de juego",tip:"8 Burpees + 10 Squat Jumps + 12 Mountain Climbers. Anotá cuántas rondas y batí el récord.",video:"https://www.youtube.com/results?search_query=burpee+squat+jump+amrap",emoji:"⏱️",img:"https://upload.wikimedia.org/wikipedia/commons/thumb/3/30/Burpee_exercise.jpg/640px-Burpee_exercise.jpg"}
+      ]}
+    ],
+    finisher:[{name:"Cool-Down Pileta (si disponible)",detail:"10 min natación suave",time:"10 min"},{name:"Stretching completo + foam roller",detail:"Todo el cuerpo sistemático",time:"8 min"}]
+  }
+};
+
+const DAY_CONFIG=[
+  {label:"DÍA 1",focus:"Piernas",workout:1},
+  {label:"DÍA 2",focus:"Tren Sup",workout:2},
+  {label:"DÍA 3",focus:"Velocidad",workout:3},
+  {label:"DÍA 4",focus:"Metabólico",workout:4}
+];
+
+// ── RECOVERY DATA ──
+const MOBILITY = {
+  cadera:[
+    {name:"90/90 Hip Stretch",duration:"60s c/lado",target:"Cadera interna y externa",hockey:"Posición base de hockey y patinada",tip:"Sentate con ambas rodillas a 90°. Inclinate hacia la pierna delantera manteniendo la espalda recta. Sentís el glúteo profundo.",timerSec:60},
+    {name:"Pigeon Pose",duration:"90s c/lado",target:"Glúteo medio, piriforme",hockey:"Clave para la rotación interna al empujar",tip:"Pierna delantera doblada frente a vos, pierna trasera extendida. Caer hacia adelante si podés. Sin dolor, solo tensión.",timerSec:90},
+    {name:"Couch Stretch",duration:"60s c/lado",target:"Flexores de cadera, cuádriceps",hockey:"Abre la cadera que se cierra de tanto flexionar en hockey",tip:"Rodilla apoyada en la pared o suelo, pie hacia arriba. Adelantar la cadera. Podés usar una caja o silla.",timerSec:60},
+    {name:"Frog Stretch",duration:"60s",target:"Aductores, cadera",hockey:"Amplitud de movimiento lateral del patinaje",tip:"De rodillas, abrí las rodillas lo máximo posible. Oscilá suavemente hacia atrás y adelante. No forzar.",timerSec:60},
+    {name:"Hip CARs (rotaciones controladas)",duration:"5 reps c/lado",target:"Articulación de cadera completa",hockey:"Mantiene el rango articular bajo fatiga",tip:"De cuadrupedia. Mové la pierna describiendo un círculo completo. Lento y controlado. El tronco no se mueve.",timerSec:0},
+    {name:"Dead Bug",duration:"3 × 10 reps",target:"Core, coordinación cadera-hombro",hockey:"Estabilidad lumbar para la posición baja",tip:"Espalda pegada al piso. Extendé brazo contrario y pierna contraria sin perder el contacto lumbar.",timerSec:0}
+  ],
+  hombros:[
+    {name:"Band Pull-Apart",duration:"3 × 15",target:"Manguito rotador, romboides",hockey:"Prevención lesiones en caídas y cargas",tip:"Brazos extendidos al frente, llevar la banda hacia el pecho. Escápulas hacia adentro al final del movimiento.",timerSec:0},
+    {name:"Wall Slide",duration:"2 × 10",target:"Serrato anterior, hombro",hockey:"Postura correcta al cargar el cuerpo en corners",tip:"Antebrazos en la pared. Deslizá los brazos hacia arriba sin despegar los codos. Muy lento.",timerSec:0},
+    {name:"Doorway Chest Stretch",duration:"45s c/lado",target:"Pectoral menor, hombro anterior",hockey:"Compensa el gesto cerrado de jugar con el stick",tip:"Antebrazo en el marco de la puerta a 90°. Rotá el cuerpo alejándote del brazo.",timerSec:45},
+    {name:"Thoracic Rotation",duration:"10 c/lado",target:"Columna torácica",hockey:"Mejora la rotación para el shot y el pase",tip:"De rodillas, mano detrás de la cabeza. Rotá el codo hacia el techo. La cadera no se mueve.",timerSec:0},
+    {name:"Shoulder CARs",duration:"5 reps c/lado",target:"Articulación glenohumeral completa",hockey:"Mantiene rango articular y previene tendinitis",tip:"Círculo completo con el hombro. Muy lento, máximo rango sin compensar con el tronco.",timerSec:0}
+  ],
+  full:[
+    {name:"World's Greatest Stretch",duration:"5 reps c/lado",target:"Cadera, torácica, isquios",hockey:"La movilidad más funcional para cualquier deporte",tip:"Estocada → mano interior en el piso → codo hacia abajo → rotar el brazo al techo. Fluido.",timerSec:0},
+    {name:"90/90 Hip Stretch",duration:"60s c/lado",target:"Cadera interna y externa",hockey:"Base de la posición de hockey",tip:"Rodillas a 90°. Inclinarte hacia la pierna delantera.",timerSec:60},
+    {name:"Pigeon Pose",duration:"90s c/lado",target:"Glúteo medio, piriforme",hockey:"Rotación interna en el empuje",tip:"Pierna delantera doblada, trasera extendida. Caer hacia adelante.",timerSec:90},
+    {name:"Couch Stretch",duration:"60s c/lado",target:"Flexores de cadera",hockey:"Apertura de cadera esencial",tip:"Rodilla en la pared o suelo. Adelantar la cadera.",timerSec:60},
+    {name:"Thoracic Rotation",duration:"10 c/lado",target:"Columna torácica",hockey:"Rotación para el shot",tip:"De rodillas, mano detrás de la cabeza. Rotar sin mover la cadera.",timerSec:0},
+    {name:"Band Pull-Apart",duration:"3 × 15",target:"Hombros, manguito",hockey:"Prevención lesiones",tip:"Brazos extendidos, llevar la banda al pecho.",timerSec:0},
+    {name:"Dead Bug",duration:"3 × 10",target:"Core, coordinación",hockey:"Estabilidad lumbar",tip:"Espalda pegada al piso. Extensión cruzada controlada.",timerSec:0},
+    {name:"Hollow Body Hold",duration:"3 × 30s",target:"Core anterior",hockey:"Base de todo el movimiento",tip:"Zona lumbar pegada al piso siempre.",timerSec:30},
+    {name:"Foam Rolling — Piernas completas",duration:"5 min",target:"Cuádriceps, isquios, glúteos, IT band",hockey:"Reduce la tensión muscular acumulada",tip:"20 pases lentos por zona. Detente 5s en los puntos más tensos.",timerSec:0}
+  ]
+};
+
+// ── MATCH MODE DATA ──
+const MATCH_PROTOCOLS = {
+  pre:[
+    {name:"Activación neurológica (warm-up general)",detail:"10 min trote suave + skips + high knees. Elevar la temperatura corporal sin agotar.",time:"10 min",timerSec:600},
+    {name:"Movilidad dinámica",detail:"Leg swings × 10 c/lado · Hip circles × 10 · Arm circles · Thoracic rotation × 8.",time:"5 min",timerSec:300},
+    {name:"Activación de glúteos",detail:"Band monster walk 2×15 pasos · Glute bridge 2×15. Activar los motores principales.",time:"5 min",timerSec:300},
+    {name:"Aceleraciones cortas",detail:"6 × sprint 10m al 70-80%. No máxima intensidad — activar el sistema neuromuscular.",time:"5 min",timerSec:300},
+    {name:"Dribling + pases cortos",detail:"10 min con el disco. Activar la coordinación ojo-mano y el patrón de movimiento específico.",time:"10 min",timerSec:600},
+    {name:"Hidratación y foco mental",detail:"Tomá 500ml de agua. Respiración: 5s inhalar, 5s exhalar × 5. Visualizá los primeros movimientos del partido.",time:"5 min",timerSec:300}
+  ],
+  post:[
+    {name:"Trote de recuperación",detail:"5-8 min trote muy suave. No parar de golpe — el cuerpo necesita bajar gradualmente.",time:"5-8 min",timerSec:360},
+    {name:"Estiramiento estático piernas",detail:"Cuádriceps, isquiotibiales, glúteos, cadera. 45s por posición c/lado. Sin forzar.",time:"10 min",timerSec:600},
+    {name:"Estiramiento hombros y espalda",detail:"Chest cross-body stretch, lat stretch, thoracic rotation suave. 45s c/posición.",time:"5 min",timerSec:300},
+    {name:"Foam rolling — zonas críticas",detail:"IT band, cuádriceps, glúteos, pantorrillas. 20 pases lentos por zona.",time:"10 min",timerSec:600},
+    {name:"Nutrición post-partido",detail:"En los primeros 30 min: 40g proteína + 60g carbos simples. Ejemplos: pollo + arroz, o shake de proteína + banana.",time:"Inmediato",timerSec:0},
+    {name:"Hidratación con electrolitos",detail:"500-750ml agua. Si sudaste mucho: agua con sal o bebida isotónica. Las próximas 4hs seguir tomando.",time:"Inmediato",timerSec:0},
+    {name:"Baño frío / contraste",detail:"Si tenés acceso: 2 min agua fría (14-16°C) + 1 min caliente × 3 ciclos. Reduce inflamación muscular hasta un 20%.",time:"10 min",timerSec:0}
+  ]
+};
+
+// ── MEAL DATA ──
+const MEAL_DAYS=[
+  {label:"DÍA PIERNAS",icon:"🦵",type:"Fuerza explosiva",dayType:"heavy"},
+  {label:"DÍA TREN SUP",icon:"💪",type:"Fuerza superior",dayType:"heavy"},
+  {label:"DÍA VELOCIDAD",icon:"⚡",type:"Agilidad/Sprint",dayType:"speed"},
+  {label:"DÍA DESCANSO",icon:"🛌",type:"Recuperación",dayType:"rest"},
+  {label:"DÍA LIBRE",icon:"🏠",type:"Sin nada",dayType:"free"},
+  {label:"PERMITIDO 🍕",icon:"🎉",type:"¿Cuándo y cómo?",dayType:"cheat"}
+];
+const MEALS={
+  heavy:[
+    {time:"7:30 AM",name:"Desayuno",desc:"Carbos + proteína para arrancar con energía",kcal:"~480 kcal",options:[
+      {title:"Avena + huevos revueltos",detail:"70g avena con leche + 3 huevos revueltos + 1 banana + café",prot:"30g prot",kcal:"480 kcal"},
+      {title:"Tostadas + huevo + queso",detail:"3 tostadas pan integral + 3 huevos + 2 fetas de queso + café con leche",prot:"32g prot",kcal:"490 kcal"},
+      {title:"Yogur griego + granola + banana",detail:"250g yogur griego + 40g granola sin azúcar + 1 banana + 15g nueces",prot:"24g prot",kcal:"470 kcal"}
+    ]},
+    {time:"10:30 AM",name:"Media mañana",desc:"Snack liviano pre-entreno",kcal:"~240 kcal",options:[
+      {title:"Arroz + atún",detail:"80g arroz cocido + 1 lata atún al natural + aceite de oliva",prot:"25g prot",kcal:"250 kcal"},
+      {title:"Pan + pechuga fría",detail:"2 rebanadas pan integral + 100g pechuga cocida + mostaza",prot:"26g prot",kcal:"235 kcal"},
+      {title:"Batata + queso cottage",detail:"150g batata cocida + 80g queso cottage + sal",prot:"14g prot",kcal:"240 kcal"}
+    ]},
+    {time:"1:00 PM",name:"Almuerzo (post-entreno)",desc:"La más importante — proteína + carbos para recuperar",kcal:"~620 kcal",options:[
+      {title:"Arroz + pollo a la plancha",detail:"180g arroz cocido + 180g pechuga + aceite de oliva + condimentos",prot:"44g prot",kcal:"620 kcal"},
+      {title:"Fideos + carne picada magra",detail:"170g fideos + 170g carne picada magra con ajo y tomate natural",prot:"42g prot",kcal:"640 kcal"},
+      {title:"Papa + salmón",detail:"220g papas hervidas + 160g salmón a la plancha + aceite + limón",prot:"38g prot",kcal:"600 kcal"},
+      {title:"Milanesa de pollo + arroz",detail:"180g milanesa de pollo al horno + 140g arroz + limón",prot:"44g prot",kcal:"630 kcal"}
+    ]},
+    {time:"5:00 PM",name:"Merienda",desc:"Energía para la tarde sin excederse",kcal:"~270 kcal",options:[
+      {title:"Ricota + miel + frutos secos",detail:"200g ricota + 1 cda miel + 20g nueces o almendras",prot:"18g prot",kcal:"280 kcal"},
+      {title:"Pan + mantequilla de maní",detail:"2 rebanadas pan + 2 cdas mantequilla de maní + vaso de leche",prot:"15g prot",kcal:"275 kcal"},
+      {title:"Queso cottage + banana",detail:"150g queso cottage + 1 banana + 1 cda miel",prot:"17g prot",kcal:"265 kcal"}
+    ]},
+    {time:"8:30 PM",name:"Cena",desc:"Proteína completa + carbos moderados",kcal:"~500 kcal",options:[
+      {title:"Bife de lomo + papa hervida",detail:"190g bife a la plancha + 180g papas + aceite de oliva",prot:"42g prot",kcal:"510 kcal"},
+      {title:"Pollo al horno + batata",detail:"190g muslo de pollo sin piel al horno + 180g batata",prot:"38g prot",kcal:"490 kcal"},
+      {title:"Atún + arroz + 2 huevos",detail:"2 latas atún + 130g arroz + 2 huevos duros + aceite",prot:"44g prot",kcal:"520 kcal"},
+      {title:"Omelette con jamón y queso",detail:"4 huevos + 70g jamón cocido + queso + 2 rebanadas pan",prot:"40g prot",kcal:"500 kcal"}
+    ]},
+    {time:"10:30 PM",name:"Antes de dormir",desc:"Proteína lenta — el músculo se repara de noche",kcal:"~160 kcal",options:[
+      {title:"Queso cottage natural",detail:"150g queso cottage — caseína de absorción lenta, ideal antes de dormir",prot:"18g prot",kcal:"160 kcal"},
+      {title:"2 huevos duros",detail:"Simple, efectivo, proteína completa sin azúcar",prot:"13g prot",kcal:"155 kcal"},
+      {title:"Yogur griego sin azúcar",detail:"200g yogur griego natural + 1 cda miel",prot:"18g prot",kcal:"155 kcal"}
+    ]}
+  ],
+  speed:[
+    {time:"7:30 AM",name:"Desayuno",desc:"Carbos altos — el cuerpo los necesita para velocidad",kcal:"~460 kcal",options:[
+      {title:"Avena + banana + miel + huevos",detail:"70g avena con leche + 1 banana + 1 cda miel + 2 huevos duros al costado",prot:"27g prot",kcal:"465 kcal"},
+      {title:"Tostadas + huevo + jugo naranja",detail:"4 tostadas pan + 2 huevos fritos + vaso jugo naranja natural",prot:"22g prot",kcal:"455 kcal"}
+    ]},
+    {time:"10:00 AM",name:"Pre-entreno (1h antes)",desc:"Liviano y de digestión rápida — nada pesado",kcal:"~200 kcal",options:[
+      {title:"Banana + 2 huevos duros",detail:"1 banana + 2 huevos duros. Carbos rápidos + proteína sin pesadez.",prot:"14g prot",kcal:"205 kcal"},
+      {title:"Arroz con canela y miel",detail:"100g arroz con leche desnatada + canela + 1 cda miel",prot:"8g prot",kcal:"200 kcal"},
+      {title:"Pan + mermelada + café",detail:"2 tostadas + mermelada + café con leche. Rápido y energético.",prot:"7g prot",kcal:"195 kcal"}
+    ]},
+    {time:"1:00 PM",name:"Post-entreno",desc:"Recuperar glucógeno + proteína",kcal:"~580 kcal",options:[
+      {title:"Pollo + arroz + jugo naranja",detail:"160g pollo hervido o a la plancha + 180g arroz + vaso jugo naranja",prot:"38g prot",kcal:"575 kcal"},
+      {title:"Milanesa de pollo + fideos",detail:"160g milanesa al horno + 160g fideos con manteca y queso rallado",prot:"42g prot",kcal:"605 kcal"},
+      {title:"Lomo + papa",detail:"180g lomo a la plancha + 200g papas hervidas + aceite",prot:"40g prot",kcal:"580 kcal"}
+    ]},
+    {time:"5:00 PM",name:"Merienda",desc:"Sostener proteína sin sobrecargarse",kcal:"~255 kcal",options:[
+      {title:"Yogur griego + banana + nueces",detail:"200g yogur griego + 1 banana + 15g nueces",prot:"20g prot",kcal:"265 kcal"},
+      {title:"Ricota + miel + almendras",detail:"200g ricota + 1 cda miel + 20g almendras",prot:"17g prot",kcal:"255 kcal"}
+    ]},
+    {time:"8:30 PM",name:"Cena",desc:"Proteína completa, carbos moderados",kcal:"~480 kcal",options:[
+      {title:"Huevos revueltos + papa + queso",detail:"4 huevos revueltos + 180g papa hervida + 35g queso fresco",prot:"34g prot",kcal:"485 kcal"},
+      {title:"Salmón + arroz",detail:"160g salmón a la plancha + 140g arroz + aceite de oliva",prot:"37g prot",kcal:"475 kcal"},
+      {title:"Carne picada + puré de papa",detail:"160g carne picada magra + 180g puré de papa con leche",prot:"34g prot",kcal:"490 kcal"}
+    ]},
+    {time:"10:30 PM",name:"Antes de dormir",desc:"Proteína lenta",kcal:"~155 kcal",options:[
+      {title:"Queso cottage natural",detail:"150g queso cottage — digestión lenta, ideal para recuperar mientras dormís",prot:"18g prot",kcal:"155 kcal"},
+      {title:"2 huevos duros",detail:"Caseína natural, sin azúcar, sin drama",prot:"13g prot",kcal:"150 kcal"}
+    ]}
+  ],
+  rest:[
+    {time:"8:00 AM",name:"Desayuno",desc:"Sin apuro — más liviano que días de entreno",kcal:"~410 kcal",options:[
+      {title:"Huevos revueltos + tostadas",detail:"3 huevos + 2 tostadas + café con leche + 1 fruta",prot:"26g prot",kcal:"415 kcal"},
+      {title:"Yogur griego + avena + fruta",detail:"200g yogur griego + 50g avena + 1 banana",prot:"24g prot",kcal:"405 kcal"}
+    ]},
+    {time:"11:00 AM",name:"Media mañana",desc:"Snack liviano",kcal:"~185 kcal",options:[
+      {title:"Frutas + nueces",detail:"2 frutas medianas + 20g nueces. Carbos naturales + grasas buenas.",prot:"4g prot",kcal:"195 kcal"},
+      {title:"Queso fresco + tostadas",detail:"40g queso fresco + 2 tostadas integrales",prot:"11g prot",kcal:"180 kcal"}
+    ]},
+    {time:"1:00 PM",name:"Almuerzo",desc:"Proteína completa, carbos moderados",kcal:"~550 kcal",options:[
+      {title:"Pollo + papa + huevo duro",detail:"180g pollo a la plancha + 160g papa + 1 huevo duro + aceite",prot:"42g prot",kcal:"555 kcal"},
+      {title:"Lomo + arroz",detail:"180g lomo a la plancha + 140g arroz + aceite",prot:"40g prot",kcal:"545 kcal"},
+      {title:"Fideos con pollo salteado",detail:"150g fideos + 160g pollo salteado con ajo + aceite de oliva",prot:"38g prot",kcal:"565 kcal"}
+    ]},
+    {time:"5:30 PM",name:"Merienda",desc:"Snack proteico de la tarde",kcal:"~245 kcal",options:[
+      {title:"Queso cottage + miel + almendras",detail:"180g queso cottage + 1 cda miel + 15g almendras",prot:"20g prot",kcal:"250 kcal"},
+      {title:"Pan + huevo duro + queso",detail:"2 tostadas + 2 huevos duros + 30g queso fresco",prot:"23g prot",kcal:"255 kcal"}
+    ]},
+    {time:"8:30 PM",name:"Cena",desc:"Liviana — el cuerpo no necesita tanta energía hoy",kcal:"~440 kcal",options:[
+      {title:"Omelette + tostadas",detail:"4 huevos en omelette + jamón cocido + queso + 2 tostadas",prot:"38g prot",kcal:"450 kcal"},
+      {title:"Pollo al horno + batata",detail:"170g pechuga al horno + 150g batata + aceite de oliva",prot:"35g prot",kcal:"435 kcal"},
+      {title:"Salmón + papa",detail:"150g salmón a la plancha + 160g papa hervida + limón",prot:"33g prot",kcal:"430 kcal"}
+    ]},
+    {time:"10:30 PM",name:"Antes de dormir",desc:"Clave en días de descanso — el músculo se repara de noche",kcal:"~155 kcal",options:[
+      {title:"Queso cottage natural",detail:"150g queso cottage — el mejor alimento para la recuperación nocturna",prot:"18g prot",kcal:"155 kcal"},
+      {title:"2 huevos duros",detail:"Proteína completa, digestión moderada",prot:"13g prot",kcal:"150 kcal"},
+      {title:"Yogur griego sin azúcar",detail:"200g yogur griego natural",prot:"18g prot",kcal:"130 kcal"}
+    ]}
+  ],
+  free:[
+    {time:"9:00 AM",name:"Desayuno",desc:"Día sin gym — arrancá con calma, pero no te olvides de la proteína",kcal:"~400 kcal",options:[
+      {title:"Huevos fritos + tostadas + café",detail:"3 huevos fritos + 2 tostadas con manteca + café con leche. Simple y rico.",prot:"24g prot",kcal:"405 kcal"},
+      {title:"Yogur griego + banana + miel",detail:"250g yogur griego + 1 banana + 1 cda miel + café",prot:"22g prot",kcal:"385 kcal"},
+      {title:"Tostadas + jamón + queso",detail:"3 tostadas + 2 fetas queso + 2 fetas jamón cocido + café con leche",prot:"26g prot",kcal:"395 kcal"}
+    ]},
+    {time:"1:00 PM",name:"Almuerzo",desc:"Comida principal — proteína real, sin apuro",kcal:"~560 kcal",options:[
+      {title:"Milanesa de ternera + papa",detail:"190g milanesa de ternera al horno + 200g papas + limón",prot:"40g prot",kcal:"565 kcal"},
+      {title:"Asado / parrilla liviana",detail:"200g vacío o costilla + 150g papa o choclo. El clásico que no jode nada.",prot:"38g prot",kcal:"550 kcal"},
+      {title:"Pollo entero al horno",detail:"220g pollo al horno con papas + condimentos. Fácil, rico y completo.",prot:"44g prot",kcal:"560 kcal"},
+      {title:"Pizza casera (opción tolerada)",detail:"2-3 porciones pizza casera con queso y jamón. Está bien si el resto del día estuvo bien.",prot:"24g prot",kcal:"600 kcal"}
+    ]},
+    {time:"5:00 PM",name:"Merienda",desc:"Algo rico sin volverse loco",kcal:"~290 kcal",options:[
+      {title:"Mate + tostadas con dulce de leche",detail:"Mate + 3 tostadas con un poco de dulce de leche. El clásico argentino.",prot:"7g prot",kcal:"305 kcal"},
+      {title:"Ricota + miel + frutos secos",detail:"200g ricota + 1 cda miel + 25g nueces o almendras",prot:"18g prot",kcal:"295 kcal"},
+      {title:"Queso fresco + fruta + nueces",detail:"60g queso fresco + 2 frutas + 1 puñado nueces",prot:"13g prot",kcal:"280 kcal"}
+    ]},
+    {time:"8:30 PM",name:"Cena",desc:"Proteína, algo de carbo, sin pasarla — el día libre no es día de comer de todo",kcal:"~490 kcal",options:[
+      {title:"Carne + arroz + huevo",detail:"170g lomo o cuadril + 140g arroz + 1 huevo duro",prot:"40g prot",kcal:"490 kcal"},
+      {title:"Pollo + fideos",detail:"170g pollo + 150g fideos con aceite de oliva y ajo",prot:"38g prot",kcal:"500 kcal"},
+      {title:"Hamburguesa casera",detail:"1 hamburguesa de carne magra casera + pan + queso + 1 huevo frito. Sin papas fritas industriales.",prot:"34g prot",kcal:"510 kcal"}
+    ]}
+  ],
+  cheat:{
+    isCheat:true,
+    cuandoSi:[
+      {emoji:"✅",titulo:"Viernes o sábado a la noche",detalle:"Si entrenaste ese día o el anterior, el músculo está en modo absorción. Un exceso calórico puede hasta ayudarte como refeed natural."},
+      {emoji:"✅",titulo:"Después del día de piernas o metabólico",detalle:"Son los entrenos que más glucógeno gastan. El cuerpo tolera mucho mejor los carbos y calorías extra justo después."},
+      {emoji:"✅",titulo:"Una vez por semana máximo",detalle:"Un permitido semanal no te afecta nada. Dos tampoco si el resto de la semana estuvo bien. El problema no es una pizza, es 4 días seguidos."}
+    ],
+    cuandoNo:[
+      {emoji:"❌",titulo:"La noche antes de entrenar velocidad",detalle:"Necesitás el sistema nervioso limpio y el estómago liviano para los sprints."},
+      {emoji:"❌",titulo:"Después de 2 días de descanso seguidos",detalle:"Sin entreno reciente, el exceso calórico se guarda con más facilidad."},
+      {emoji:"❌",titulo:"Las 2 semanas antes del mundial",detalle:"En la etapa de pico de forma conviene estar afilado. Ese no es el momento."}
+    ],
+    alcohol:[
+      {emoji:"🍷",titulo:"¿Qué tomar si salís?",detalle:"Vino o fernet con soda antes que cerveza — menos carbohidratos. Evitá mezclar bebidas."},
+      {emoji:"🍗",titulo:"Comé proteína antes de salir",detalle:"Un par de huevos o algo con proteína antes de tomar frena la degradación muscular cuando hay alcohol en sangre."},
+      {emoji:"⏱",titulo:"El alcohol frena la síntesis proteica 24-36hs",detalle:"Si podés, entrená antes de salir ese día y dejá el día siguiente como descanso."}
+    ],
+    opciones:[
+      {emoji:"🍕",titulo:"Pizza",detalle:"2-3 porciones está bien. Si podés elegir, con jamón y queso — más proteína."},
+      {emoji:"🍔",titulo:"Hamburguesa",detalle:"Sin drama. Si es casera o de un lugar bueno, mejor. Evitá las industriales congeladas."},
+      {emoji:"🍖",titulo:"Asado / parrilla",detalle:"La mejor opción de 'permitido' que existe. Proteína alta, sin procesados. El asado es casi perfecto."},
+      {emoji:"🍝",titulo:"Pastas",detalle:"Un plato de pastas está bien. El problema no es la pasta, es la cantidad de carbos extra antes de dormir."}
+    ]
+  }
+};
+
+// ══════════════════════════════════════════════════════════════════
+// STATE
+// ══════════════════════════════════════════════════════════════════
+let currentDay=0;
+let completedExercises={};
+let weightLog={}; // wl_dayKey_exKey_sN -> value
+let weightHistory={}; // wh_exName_sessionN -> {date,weight}
+let currentMealDay=0;
+let selectedMealOptions={};
+let currentRecovery='cadera';
+let currentMatchMode='pre';
+let waterCount=0;
+let rpeData={}; // dayKey -> {rpe, note}
+// Timer state
+let timerInterval=null;
+let timerRemaining=0;
+let timerTotal=0;
+
+// ══════════════════════════════════════════════════════════════════
+// UTILS
+// ══════════════════════════════════════════════════════════════════
+function getDaysUntil(d){const t=new Date(d),n=new Date();return Math.max(0,Math.ceil((t-n)/(86400000)));}
+function getTodayIdx(){const m={1:0,2:1,3:-1,4:2,5:3,6:-1,0:-1};return m[new Date().getDay()];}
+function pad(n){return String(n).padStart(2,'0');}
+function fmtTime(s){return `${pad(Math.floor(s/60))}:${pad(s%60)}`;}
+function saveLS(key,val){try{localStorage.setItem(key,JSON.stringify(val));}catch(e){}}
+function loadLS(key,def){try{const v=localStorage.getItem(key);return v?JSON.parse(v):def;}catch(e){return def;}}
+
+// ══════════════════════════════════════════════════════════════════
+// PERSISTENT STORAGE (localStorage)
+// ══════════════════════════════════════════════════════════════════
+function saveAll(){
+  saveLS('ip_weights',weightLog);
+  saveLS('ip_history',weightHistory);
+  saveLS('ip_water',waterCount);
+  saveLS('ip_rpe',rpeData);
+  saveLS('ip_meals',selectedMealOptions);
+}
+function loadAll(){
+  weightLog=loadLS('ip_weights',{});
+  weightHistory=loadLS('ip_history',{});
+  waterCount=loadLS('ip_water',0);
+  rpeData=loadLS('ip_rpe',{});
+  selectedMealOptions=loadLS('ip_meals',{});
+}
+
+// ══════════════════════════════════════════════════════════════════
+// REST TIMER
+// ══════════════════════════════════════════════════════════════════
+function startTimer(seconds,label){
+  if(seconds<=0)return;
+  clearInterval(timerInterval);
+  timerRemaining=seconds;
+  timerTotal=seconds;
+  const ft=document.getElementById('floatingTimer');
+  ft.classList.add('visible');
+  ft.querySelector('.ft-label').textContent='DESCANSO'+(label?' — '+label:'');
+  updateTimerDisplay();
+  timerInterval=setInterval(()=>{
+    timerRemaining--;
+    updateTimerDisplay();
+    if(timerRemaining<=0){
+      clearInterval(timerInterval);
+      vibrate();
+      document.getElementById('ftDisplay').textContent='¡LISTO!';
+      document.getElementById('ftDisplay').classList.remove('urgent');
+      setTimeout(()=>closeTimer(),2000);
+    }
+  },1000);
+}
+function updateTimerDisplay(){
+  const el=document.getElementById('ftDisplay');
+  el.textContent=fmtTime(timerRemaining);
+  el.classList.toggle('urgent',timerRemaining<=10);
+}
+function addTime(s){timerRemaining+=s;updateTimerDisplay();}
+function resetTimer(){timerRemaining=timerTotal;updateTimerDisplay();}
+function closeTimer(){clearInterval(timerInterval);document.getElementById('floatingTimer').classList.remove('visible');}
+function vibrate(){if(navigator.vibrate)navigator.vibrate([200,100,200]);}
+
+// ══════════════════════════════════════════════════════════════════
+// WEIGHT LOG & HISTORY
+// ══════════════════════════════════════════════════════════════════
+function wKey(dk,ek,si){return `wl_${dk}_${ek}_s${si}`;}
+function getBest(dk,ek,n){
+  let b=0;
+  for(let i=0;i<n;i++){const v=parseFloat(weightLog[wKey(dk,ek,i)]);if(!isNaN(v)&&v>b)b=v;}
+  return b>0?b:null;
+}
+function saveWeight(k,v){weightLog[k]=v;saveAll();}
+function onWeightInput(wk,dk,ek,n,event){
+  event.stopPropagation();
+  saveWeight(wk,event.target.value);
+  // Save to history keyed by exercise name + date
+  const exName=wk.replace(/wl_day\d+_main_\d+_\d+_s\d+/,'');
+  const dateKey=new Date().toISOString().slice(0,10);
+  const best=getBest(dk,ek,n);
+  if(best){
+    if(!weightHistory[ek])weightHistory[ek]=[];
+    const existing=weightHistory[ek].findIndex(h=>h.date===dateKey);
+    if(existing>=0)weightHistory[ek][existing].weight=best;
+    else weightHistory[ek].push({date:dateKey,weight:best});
+    // Keep last 8 sessions
+    if(weightHistory[ek].length>8)weightHistory[ek]=weightHistory[ek].slice(-8);
+    saveAll();
+  }
+  // Update best label
+  const bestEl=document.getElementById(`best_${dk}_${ek}`);
+  if(bestEl)bestEl.innerHTML=best?`🏆 Mejor hoy: <b>${best} kg</b>`:'— sin registro aún';
+  // Update chart
+  renderWeightChart(dk,ek,n);
+}
+
+function renderWeightChart(dk,ek,n){
+  const container=document.getElementById(`chart_${dk}_${ek}`);
+  if(!container)return;
+  const history=weightHistory[ek]||[];
+  if(history.length<2){container.innerHTML=`<div class="wh-empty">Registrá al menos 2 sesiones para ver el gráfico 📈</div>`;return;}
+  const maxW=Math.max(...history.map(h=>h.weight));
+  const bars=history.map(h=>{
+    const pct=Math.round((h.weight/maxW)*100);
+    const d=h.date.slice(5); // MM-DD
+    return `<div class="wh-bar-wrap"><div class="wh-bar-val">${h.weight}</div><div class="wh-bar" style="height:${pct}%"></div><div class="wh-bar-label">${d}</div></div>`;
+  }).join('');
+  container.innerHTML=bars;
+}
+
+// ══════════════════════════════════════════════════════════════════
+// RENDER: WORKOUT
+// ══════════════════════════════════════════════════════════════════
+function renderDaySelector(){
+  const c=document.getElementById('daySelector');
+  const ti=getTodayIdx();
+  c.innerHTML=DAY_CONFIG.map((d,i)=>`
+    <button class="day-btn ${i===currentDay?'active':''}" onclick="selectDay(${i})">
+      <span class="day-number">${i+1}</span>
+      <span class="day-label">${d.focus}</span>
+      ${ti===i?'<span class="today-marker pulse"></span>':''}
+    </button>`).join('');
+}
+
+function countExercises(w){
+  let n=0;
+  w.warmup?.forEach(()=>n++);
+  w.main?.forEach(b=>b.exercises.forEach(()=>n++));
+  return n;
+}
+
+function renderWorkout(di){
+  const cfg=DAY_CONFIG[di];
+  const w=WORKOUTS[cfg.workout];
+  const content=document.getElementById('workoutContent');
+  const key=`day${di}`;
+  if(!completedExercises[key])completedExercises[key]={};
+
+  let html=`<div class="fade-in">
+    <div style="margin-bottom:16px">
+      <span class="phase-tag">${w.tag}</span>
+      <span class="phase-tag" style="background:rgba(0,212,255,0.1);border-color:rgba(0,212,255,0.3);color:var(--accent)">⏱ ${w.duration}</span>
+      <div class="workout-title">${w.title}</div>
+      <div class="workout-subtitle">${w.subtitle}</div>
+    </div>`;
+
+  // WARMUP
+  html+=`<div class="section-header"><span class="section-title">🔥 ENTRADA EN CALOR</span><div class="section-line"></div></div><div class="exercise-list">`;
+  w.warmup.forEach((ex,i)=>{
+    const ek=`warmup_${i}`;
+    const done=!!completedExercises[key][ek];
+    html+=`<div class="exercise-card ${done?'completed':''}" id="card_${key}_${ek}">
+      <div class="exercise-main" onclick="toggleDetail('${key}','${ek}')">
+        <div class="exercise-num">${i+1}</div>
+        <div><div class="exercise-name">${ex.name}</div><div class="exercise-muscles">${ex.muscles}</div><div class="exercise-hockey">🏒 ${ex.hockey}</div></div>
+        <div class="exercise-params"><div class="param-sets">${ex.duration}</div></div>
+      </div>
+      <div class="exercise-detail" id="detail_${key}_${ek}">
+        <div class="action-row"><button class="check-btn" onclick="toggleComplete('${key}','${ek}',event)">${done?'✅ Completado':'○ Marcar hecho'}</button></div>
+      </div></div>`;
+  });
+  html+='</div>';
+
+  // MAIN
+  html+=`<div class="section-header"><span class="section-title">💪 ENTRENAMIENTO PRINCIPAL</span><div class="section-line"></div></div>`;
+  w.main.forEach((block,bi)=>{
+    if(block.superset)html+=`<div class="superset-label">⚡ ${block.label}</div>`;
+    html+='<div class="exercise-list" style="margin-bottom:14px">';
+    block.exercises.forEach((ex,ei)=>{
+      const ek=`main_${bi}_${ei}`;
+      const done=!!completedExercises[key][ek];
+      const setsN=parseInt(ex.sets)||3;
+      const capN=Math.min(setsN,6);
+      // Set dots
+      const dots=Array.from({length:capN},(_,si)=>{
+        const sk=`${key}_${ek}_set${si}`;
+        const sd=!!completedExercises[sk];
+        return `<div class="set-dot ${sd?'done':''}" onclick="toggleSet('${key}','${ek}','${sk}',${si},${capN},${ex.rest||0},event)">${si+1}</div>`;
+      }).join('');
+      // Weight inputs
+      const winputs=Array.from({length:capN},(_,si)=>{
+        const wk=wKey(key,ek,si);
+        const val=weightLog[wk]||'';
+        return `<div class="weight-log-item">
+          <span class="weight-log-label">S${si+1}</span>
+          <input class="weight-input" type="number" min="0" step="0.5" placeholder="0" value="${val}"
+            id="wi_${wk}" onclick="event.stopPropagation()"
+            oninput="onWeightInput('${wk}','${key}','${ek}',${capN},event)">
+          <span class="weight-unit">kg</span>
+        </div>`;
+      }).join('');
+      const best=getBest(key,ek,capN);
+      const bestLabel=best?`🏆 Mejor hoy: <b>${best} kg</b>`:'— sin registro aún';
+      // History
+      const hist=weightHistory[ek]||[];
+      const histHtml=hist.length>=2
+        ?`<div class="wh-chart" id="chart_${key}_${ek}"></div>`
+        :`<div class="wh-empty">Registrá al menos 2 sesiones para ver el gráfico 📈</div>`;
+      // Image
+      const imgHtml=ex.img?`<div class="exercise-img-wrap"><img src="${ex.img}" alt="${ex.name}" loading="lazy" onerror="this.parentElement.style.display='none'"><div class="img-caption">Referencia</div></div>`:'';
+      html+=`<div class="exercise-card ${done?'completed':''}" id="card_${key}_${ek}">
+        <div class="exercise-main" onclick="toggleDetail('${key}','${ek}')">
+          <div class="exercise-num">${ex.emoji||(bi+1)}</div>
+          <div><div class="exercise-name">${ex.name}</div><div class="exercise-muscles">${ex.muscles}</div><div class="exercise-hockey">🏒 ${ex.hockey}</div></div>
+          <div class="exercise-params"><div class="param-sets">${ex.sets}</div><div class="param-rest">desc: ${ex.restLabel}</div></div>
+        </div>
+        <div class="exercise-detail" id="detail_${key}_${ek}">
+          ${imgHtml}
+          <div class="exercise-tip" style="margin-top:12px">💡 <b>Técnica:</b> ${ex.tip}</div>
+          <div class="weight-log-section">
+            <div class="weight-log-title">📊 Registro de pesos — hoy</div>
+            <div class="weight-log-grid">${winputs}</div>
+            <div class="weight-best" id="best_${key}_${ek}">${bestLabel}</div>
+          </div>
+          <div class="weight-history-section">
+            <div class="wh-title">📈 Progresión histórica (kg)</div>
+            ${histHtml}
+          </div>
+          <div style="margin-top:10px;font-size:0.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">Series completadas</div>
+          <div class="set-tracker">${dots}</div>
+          ${ex.rest>0?`<button class="rest-timer-btn" onclick="startTimer(${ex.rest},'${ex.name}');event.stopPropagation()">⏱ Iniciar descanso ${ex.restLabel}</button>`:''}
+          <div class="action-row">
+            <button class="check-btn" onclick="toggleComplete('${key}','${ek}',event)">${done?'✅ Completado':'○ Marcar hecho'}</button>
+            <a href="${ex.video}" target="_blank" class="video-link" onclick="event.stopPropagation()">▶ Video</a>
+          </div>
+        </div></div>`;
+    });
+    html+='</div>';
+  });
+
+  // FINISHER
+  html+=`<div class="section-header"><span class="section-title" style="color:var(--accent2)">🔥 FINISHER</span><div class="section-line"></div></div>
+    <div class="finisher-card"><div class="finisher-title">CIERRE DEL ENTRENO</div>`;
+  w.finisher.forEach(f=>{
+    html+=`<div class="finisher-item"><div><div style="font-weight:500">${f.name}</div>${f.detail?`<div style="font-size:0.72rem;color:var(--muted);margin-top:2px">${f.detail}</div>`:''}</div><div class="finisher-time">${f.time}</div></div>`;
+  });
+  html+='</div>';
+
+  // RPE
+  const rpe=rpeData[key]||{rpe:0,note:''};
+  const rpeBtns=Array.from({length:10},(_,i)=>`<button class="rpe-btn ${rpe.rpe===i+1?'active':''}" onclick="setRpe('${key}',${i+1},this)">${i+1}</button>`).join('');
+  html+=`<div class="rpe-section">
+    <div class="rpe-title">📝 SESIÓN DE HOY</div>
+    <div style="font-size:0.78rem;color:var(--muted);margin-bottom:10px">¿Cómo te sentiste? (1=muy fácil, 10=al límite)</div>
+    <div class="rpe-scale">${rpeBtns}</div>
+    <textarea class="rpe-note" id="rpeNote_${key}" placeholder="Notas de la sesión: cómo te sentiste, qué mejorar, PBs..." onclick="event.stopPropagation()">${rpe.note||''}</textarea>
+    <button class="rpe-save-btn" onclick="saveRpe('${key}')">💾 Guardar sesión</button>
+    <div class="rpe-saved" id="rpeSaved_${key}">✅ Guardado</div>
+  </div>`;
+
+  html+='</div>';
+  content.innerHTML=html;
+  updateProgress(di);
+  // Render existing charts
+  w.main.forEach((block,bi)=>block.exercises.forEach((_,ei)=>{
+    const ek=`main_${bi}_${ei}`;
+    renderWeightChart(key,ek,Math.min(parseInt(_.sets)||3,6));
+  }));
+}
+
+function updateProgress(di){
+  const w=WORKOUTS[DAY_CONFIG[di].workout];
+  const key=`day${di}`;
+  const total=countExercises(w);
+  const done=Object.values(completedExercises[key]||{}).filter(Boolean).length;
+  const pct=total>0?Math.round((done/total)*100):0;
+  document.getElementById('progressText').textContent=`${done} / ${total}`;
+  document.getElementById('progressFill').style.width=`${pct}%`;
+}
+
+// ══════════════════════════════════════════════════════════════════
+// INTERACTIONS
+// ══════════════════════════════════════════════════════════════════
+function selectDay(i){currentDay=i;renderDaySelector();renderWorkout(i);}
+
+function toggleDetail(dk,ek){
+  const el=document.getElementById(`detail_${dk}_${ek}`);
+  if(el)el.classList.toggle('open');
+}
+
+function toggleComplete(dk,ek,event){
+  event.stopPropagation();
+  if(!completedExercises[dk])completedExercises[dk]={};
+  completedExercises[dk][ek]=!completedExercises[dk][ek];
+  const card=document.getElementById(`card_${dk}_${ek}`);
+  if(card)card.classList.toggle('completed',completedExercises[dk][ek]);
+  const btn=card?.querySelector('.check-btn');
+  if(btn)btn.textContent=completedExercises[dk][ek]?'✅ Completado':'○ Marcar hecho';
+  updateProgress(currentDay);
+}
+
+function toggleSet(dk,ek,sk,si,total,restSec,event){
+  event.stopPropagation();
+  const el=event.currentTarget;
+  el.classList.toggle('done');
+  completedExercises[sk]=el.classList.contains('done');
+  // Auto-start timer when set is done and there are more sets
+  if(el.classList.contains('done')&&restSec>0){
+    // Count done sets
+    let doneSets=0;
+    for(let i=0;i<total;i++){if(completedExercises[`${dk}_${ek}_set${i}`])doneSets++;}
+    if(doneSets<total)startTimer(restSec);
+  }
+}
+
+function setRpe(dk,val,btn){
+  if(!rpeData[dk])rpeData[dk]={rpe:0,note:''};
+  rpeData[dk].rpe=val;
+  document.querySelectorAll('.rpe-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+function saveRpe(dk){
+  if(!rpeData[dk])rpeData[dk]={rpe:0,note:''};
+  const noteEl=document.getElementById(`rpeNote_${dk}`);
+  if(noteEl)rpeData[dk].note=noteEl.value;
+  saveAll();
+  const saved=document.getElementById(`rpeSaved_${dk}`);
+  if(saved){saved.style.display='block';setTimeout(()=>saved.style.display='none',2000);}
+}
+
+// ══════════════════════════════════════════════════════════════════
+// TAB SWITCH
+// ══════════════════════════════════════════════════════════════════
+function switchTab(id,btn){
+  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('tab-'+id).classList.add('active');
+  btn.classList.add('active');
+}
+
+// ══════════════════════════════════════════════════════════════════
+// NUTRITION
+// ══════════════════════════════════════════════════════════════════
+function renderMealDaySelector(){
+  const c=document.getElementById('mealDaySelector');
+  c.innerHTML=MEAL_DAYS.map((d,i)=>`
+    <button class="meal-day-btn ${i===currentMealDay?'active':''}" onclick="selectMealDay(${i})">
+      <span class="mdb-icon">${d.icon}</span>
+      <span class="mdb-label">${d.label}</span>
+      <span class="mdb-type">${d.type}</span>
+    </button>`).join('');
+}
+
+function selectMealDay(i){currentMealDay=i;renderMealDaySelector();renderMeals(i);}
+
+function renderMeals(di){
+  const dayType=MEAL_DAYS[di].dayType;
+  const data=MEALS[dayType];
+
+  // ── CHEAT DAY ──
+  if(dayType==='cheat'){
+    const d=data;
+    const mkSection=(title,color,items,isList)=>{
+      const rows=items.map(it=>`
+        <div style="display:flex;gap:12px;align-items:flex-start;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:8px">
+          <span style="font-size:1.3rem;flex-shrink:0">${it.emoji}</span>
+          <div><div style="font-weight:600;font-size:0.88rem;margin-bottom:3px">${it.titulo}</div><div style="font-size:0.78rem;color:var(--muted);line-height:1.5">${it.detalle}</div></div>
+        </div>`).join('');
+      return `<div style="margin-bottom:18px">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:1rem;letter-spacing:2px;color:${color};margin-bottom:10px">${title}</div>
+        ${rows}</div>`;
+    };
+    let html=`<div style="background:linear-gradient(135deg,rgba(255,107,53,0.1),rgba(255,107,53,0.03));border:1px solid rgba(255,107,53,0.3);border-radius:14px;padding:18px;margin-bottom:16px">
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:1.6rem;letter-spacing:2px;color:var(--accent2);margin-bottom:6px">🎉 EL PERMITIDO</div>
+      <div style="font-size:0.8rem;color:var(--muted);line-height:1.5">Una vez por semana no te afecta nada. La clave es <b style="color:var(--text)">cuándo</b> lo hacés.</div>
+    </div>`;
+    html+=mkSection('✅ CUÁNDO SÍ — LOS MEJORES MOMENTOS','var(--accent3)',d.cuandoSi);
+    html+=mkSection('❌ CUÁNDO NO','#ff4444',d.cuandoNo);
+    html+=mkSection('🍹 SI TOMÁS ALCOHOL','#a78bfa',d.alcohol);
+    html+=mkSection('🍕 QUÉ COMER EN EL PERMITIDO','var(--accent)',d.opciones);
+    document.getElementById('mealContent').innerHTML=html;
+    return;
+  }
+
+  // ── NORMAL DAYS (heavy / speed / rest / free) ──
+  let html='<div class="meal-timeline">';
+  if(dayType==='free'){
+    html=`<div style="background:rgba(0,212,255,0.05);border:1px solid rgba(0,212,255,0.2);border-radius:12px;padding:14px 16px;margin-bottom:14px;font-size:0.82rem;color:var(--muted);line-height:1.6">
+      <b style="color:var(--text)">🏠 Día sin gym</b> — El objetivo es mantener la proteína arriba de <b style="color:var(--accent2)">90-100g</b> y no pasarte de calorías. No necesitás ser perfecto, pero tampoco tirar todo por la borda. Comé rico y tranquilo.
+    </div><div class="meal-timeline">`;
+  }
+  data.forEach((meal,mi)=>{
+    const sk=`${di}_${mi}`;
+    const sel=selectedMealOptions[sk]??null;
+    const selOpt=sel!==null?meal.options[sel]:null;
+    const opts=meal.options.map((opt,oi)=>`
+      <div class="meal-option ${sel===oi?'selected':''}" onclick="selectMealOption(${di},${mi},${oi})">
+        <div class="option-title">${opt.title}</div>
+        <div class="option-detail">${opt.detail}</div>
+        <div class="option-macros"><span class="opt-macro prot">🥩 ${opt.prot}</span><span class="opt-macro kcal">⚡ ${opt.kcal}</span></div>
+      </div>`).join('');
+    html+=`<div class="meal-block">
+      <div class="meal-block-header" onclick="toggleMealDetail(${mi})">
+        <div class="meal-time-badge">${meal.time}</div>
+        <div class="meal-info">
+          <div class="meal-name">${meal.name}${selOpt?' <span style="color:var(--accent3);font-size:0.7rem">✓</span>':''}</div>
+          <div class="meal-desc">${selOpt?selOpt.title:meal.desc}</div>
+        </div>
+        <div class="meal-kcal">${meal.kcal}</div>
+      </div>
+      <div class="meal-detail-body" id="mealDetail_${mi}">
+        <div class="meal-options">${opts}</div>
+      </div></div>`;
+  });
+  html+='</div>';
+  if(dayType==='free') html+='</div>';
+  document.getElementById('mealContent').innerHTML=html;
+}
+
+function toggleMealDetail(mi){const el=document.getElementById(`mealDetail_${mi}`);if(el)el.classList.toggle('open');}
+function selectMealOption(di,mi,oi){
+  const sk=`${di}_${mi}`;
+  selectedMealOptions[sk]=selectedMealOptions[sk]===oi?undefined:oi;
+  saveAll();
+  renderMeals(di);
+  setTimeout(()=>{const el=document.getElementById(`mealDetail_${mi}`);if(el)el.classList.add('open');},10);
+}
+
+// HYDRATION
+function renderWaterTrack(){
+  const c=document.getElementById('waterTrack');
+  c.innerHTML=Array.from({length:10},(_,i)=>`<div class="water-glass ${i<waterCount?'filled':''}" onclick="toggleWater(${i})"></div>`).join('');
+  document.getElementById('waterCount').textContent=waterCount;
+  document.getElementById('waterMl').textContent=(waterCount*250).toLocaleString();
+}
+function toggleWater(i){waterCount=waterCount===i+1?i:i+1;saveAll();renderWaterTrack();}
+
+// ══════════════════════════════════════════════════════════════════
+// RECOVERY
+// ══════════════════════════════════════════════════════════════════
+function selectRecovery(type,btn){
+  currentRecovery=type;
+  document.querySelectorAll('.rec-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderMobility(type);
+}
+
+function renderMobility(type){
+  const exercises=MOBILITY[type];
+  const c=document.getElementById('mobilityContent');
+  let html='<div class="mobility-list">';
+  exercises.forEach((ex,i)=>{
+    html+=`<div class="mobility-card">
+      <div class="mobility-header" onclick="toggleMobDetail(${i})">
+        <div class="mob-order">${i+1}</div>
+        <div class="mob-info">
+          <div class="mob-name">${ex.name}</div>
+          <div class="mob-target">${ex.target}</div>
+          <div class="mob-hockey">🏒 ${ex.hockey}</div>
+        </div>
+        <div class="mob-duration">${ex.duration}</div>
+      </div>
+      <div class="mob-detail" id="mobDetail_${i}">
+        <div class="mob-tip">💡 ${ex.tip}</div>
+        ${ex.timerSec>0?`<button class="mob-timer-btn" onclick="startTimer(${ex.timerSec},'${ex.name}');event.stopPropagation()">⏱ Iniciar ${fmtTime(ex.timerSec)}</button>`:''}
+      </div>
+    </div>`;
+  });
+  html+='</div>';
+  c.innerHTML=html;
+}
+function toggleMobDetail(i){const el=document.getElementById(`mobDetail_${i}`);if(el)el.classList.toggle('open');}
+
+// ══════════════════════════════════════════════════════════════════
+// MATCH MODE
+// ══════════════════════════════════════════════════════════════════
+function selectMatchMode(mode,btn){
+  currentMatchMode=mode;
+  document.querySelectorAll('.match-mode-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderMatchProtocol(mode);
+}
+
+function renderMatchProtocol(mode){
+  const steps=MATCH_PROTOCOLS[mode];
+  const c=document.getElementById('matchContent');
+  let html='<div class="match-protocol">';
+  steps.forEach((s,i)=>{
+    html+=`<div class="protocol-step">
+      <div class="step-num">${i+1}</div>
+      <div class="step-info">
+        <div class="step-name">${s.name}</div>
+        <div class="step-detail">${s.detail}</div>
+        ${s.timerSec>0?`<button class="protocol-timer-btn" onclick="startTimer(${s.timerSec},'${s.name}')">⏱ ${fmtTime(s.timerSec)}</button>`:''}
+      </div>
+      <div class="step-time">${s.time}</div>
+    </div>`;
+  });
+  html+='</div>';
+  c.innerHTML=html;
+}
+
+// ══════════════════════════════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════════════════════════════
+document.addEventListener('DOMContentLoaded',()=>{
+  loadAll();
+  loadFioAll();
+
+  const now=new Date();
+  const days=['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
+  const months=['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+  document.getElementById('todayName').textContent=days[now.getDay()];
+  document.getElementById('currentDate').textContent=`${now.getDate()} ${months[now.getMonth()]} ${now.getFullYear()}`;
+  document.getElementById('daysCount').textContent=getDaysUntil('2026-03-27');
+
+  const ti=getTodayIdx();
+  currentDay=ti>=0?ti:0;
+
+  renderDaySelector();
+  renderWorkout(currentDay);
+  renderMealDaySelector();
+  renderMeals(currentMealDay);
+  renderWaterTrack();
+  renderMobility('cadera');
+  renderMatchProtocol('pre');
+
+  if('serviceWorker' in navigator){
+    navigator.serviceWorker.register('sw.js').catch(()=>{});
+  }
+});
+
+// ══════════════════════════════════════════════════════════════════
+// FIORELLA DATA
+// ══════════════════════════════════════════════════════════════════
+const FIO_DAYS=[
+  {label:"DÍA 1",focus:"Glúteos A",tag:"GLÚTEOS / PIERNAS",emoji:"🍑"},
+  {label:"DÍA 2",focus:"Tren Sup",tag:"TREN SUPERIOR",emoji:"💪"},
+  {label:"DÍA 3",focus:"Glúteos B",tag:"GLÚTEOS / CORE",emoji:"🔥"},
+  {label:"DÍA 4",focus:"Funcional",tag:"FUNCIONAL / CARDIO",emoji:"⚡"},
+  {label:"DÍA 5",focus:"Piernas +",tag:"PIERNAS / TONIF.",emoji:"🦵"}
+];
+
+const FIO_WORKOUTS={
+  0:{title:"GLÚTEOS & PIERNAS — VOLUMEN",subtitle:"Glúteos, cuádriceps, isquiotibiales. Foco en hipertrofia de glúteo.",duration:"55-65 min",
+    warmup:[
+      {name:"Caminadora inclinada",dur:"5 min al 4-5% inclinación",muscles:"Activación glúteo mediano, cardiovascular"},
+      {name:"Band Glute Activation",dur:"2×15 pasos laterales + 15 bridges",muscles:"Glúteo medio y mayor — esencial activarlos antes"},
+      {name:"Hip Circle + Leg Swing",dur:"10 c/lado",muscles:"Movilidad cadera, psoas"}
+    ],
+    main:[
+      {ss:false,exs:[{name:"Hip Thrust con barra",sets:"4×10-12",rest:75,rl:"75s",muscles:"Glúteo mayor",goal:"El ejercicio #1 para volumen de glúteo",tip:"Pies apoyados, rodillas a 90°. Squeeze en la cima 1 segundo. Que la barra pese — progresar semana a semana.",emoji:"🍑",video:"https://www.youtube.com/results?search_query=hip+thrust+barra+forma"}]},
+      {ss:true,label:"SUPERSET A",exs:[
+        {name:"Sentadilla goblet con KB",sets:"3×12",rest:0,rl:"—",muscles:"Cuádriceps, glúteos, core",goal:"Tonificación piernas completa",tip:"Pies a ancho de hombros, punta del pie hacia afuera. Bajá hasta que los muslos queden paralelos al piso.",emoji:"🏋️",video:"https://www.youtube.com/results?search_query=goblet+squat+forma"},
+        {name:"Romanian Deadlift con mancuernas",sets:"3×12",rest:60,rl:"60s",muscles:"Isquiotibiales, glúteo bajo",goal:"Definición posterior de piernas",tip:"Bisagra de cadera pura. Bajá las mancuernas por la pierna sintiendo los isquios. No doblar la rodilla.",emoji:"🎯",video:"https://www.youtube.com/results?search_query=rdl+mancuernas+forma"}
+      ]},
+      {ss:false,exs:[{name:"Bulgarian Split Squat",sets:"3×10 c/lado",rest:60,rl:"60s",muscles:"Glúteo, cuádriceps unilateral",goal:"Corrección de asimetrías, tonificación",tip:"Pie trasero elevado. Bajá lento (3s), subí fuerte. El glúteo trabaja más si el torso va levemente inclinado.",emoji:"🦵",video:"https://www.youtube.com/results?search_query=bulgarian+split+squat+forma"}]},
+      {ss:true,label:"SUPERSET B",exs:[
+        {name:"Abducción en máquina / con banda",sets:"3×20",rest:0,rl:"—",muscles:"Glúteo mediano y menor",goal:"Anchura y redondeamiento del glúteo",tip:"Movimiento controlado, no con impulso. En la posición de máxima abducción apretá 1 segundo.",emoji:"↔️",video:"https://www.youtube.com/results?search_query=hip+abduction+machine+forma"},
+        {name:"Glute Kickback en máquina / cuadrupedia",sets:"3×15 c/lado",rest:45,rl:"45s",muscles:"Glúteo mayor, superior",goal:"Definición y levantamiento del glúteo",tip:"Core activado, pelvis neutra. Extensión de cadera pura — no arquear la espalda lumbar.",emoji:"🌟",video:"https://www.youtube.com/results?search_query=glute+kickback+forma"}
+      ]},
+      {ss:false,exs:[{name:"Sentadilla sumo con mancuerna",sets:"3×12",rest:45,rl:"45s",muscles:"Aductores, glúteos, cuádriceps internos",goal:"Tonificación cara interna de muslo",tip:"Pies muy abiertos, punta de pie mirando hacia afuera. La mancuerna cuelga entre las piernas.",emoji:"🔷",video:"https://www.youtube.com/results?search_query=sumo+squat+mancuerna"}]}
+    ],
+    finisher:[
+      {name:"Glute Burnout: band walks laterales",detail:"2×20 pasos c/lado sin soltar la banda",time:"4 min"},
+      {name:"Estiramiento glúteos + isquios",detail:"Pigeon pose 60s c/lado + forward fold",time:"5 min"}
+    ]
+  },
+  1:{title:"TREN SUPERIOR + CORE",subtitle:"Brazos, espalda, hombros — tonificación sin bulk",duration:"50-60 min",
+    warmup:[
+      {name:"Band Pull-Aparts",dur:"3×15",muscles:"Manguito rotador, romboides"},
+      {name:"Arm Circles + Shoulder Rolls",dur:"30s c/dirección",muscles:"Calentamiento articular hombros"},
+      {name:"Cat-Cow + Thoracic Rotation",dur:"10 c/lado",muscles:"Columna, movilidad torácica"}
+    ],
+    main:[
+      {ss:true,label:"SUPERSET A — ESPALDA / PECHO",exs:[
+        {name:"Remo con mancuerna 1 brazo",sets:"3×12 c/lado",rest:0,rl:"—",muscles:"Espalda media, bíceps, core",goal:"Definición de espalda, postura",tip:"Apoyo en banco, espalda paralela. Codo pegado al cuerpo al subir. No rotar el torso.",emoji:"🎯",video:"https://www.youtube.com/results?search_query=remo+mancuerna+un+brazo+forma"},
+        {name:"Press con mancuernas en banco",sets:"3×12",rest:60,rl:"60s",muscles:"Pectoral, tríceps, hombro anterior",goal:"Tonificación pecho y brazos",tip:"Bajá hasta sentir el pecho abierto. Empujá sin bloquear los codos arriba.",emoji:"💪",video:"https://www.youtube.com/results?search_query=press+mancuernas+banco+forma"}
+      ]},
+      {ss:true,label:"SUPERSET B — HOMBROS / ESPALDA ALTA",exs:[
+        {name:"Elevaciones laterales con mancuernas",sets:"3×15",rest:0,rl:"—",muscles:"Deltoides medio",goal:"Hombros redondeados, define brazos",tip:"Poco peso, mucho control. Brazos ligeramente doblados. No subir por arriba del hombro.",emoji:"↗️",video:"https://www.youtube.com/results?search_query=elevaciones+laterales+mancuernas"},
+        {name:"Face Pull con polea / banda",sets:"3×15",rest:45,rl:"45s",muscles:"Deltoides posterior, trapecio",goal:"Postura, espalda alta definida",tip:"Tirá hacia la cara, codos altos. Abre los brazos al final como si quisieras mostrar los bíceps.",emoji:"🔙",video:"https://www.youtube.com/results?search_query=face+pull+polea+forma"}
+      ]},
+      {ss:false,exs:[{name:"Curl de bíceps alterno con mancuernas",sets:"3×12 c/lado",rest:45,rl:"45s",muscles:"Bíceps braquial",goal:"Tonificación brazos",tip:"Movimiento lento en la bajada (2-3s). Supinación completa de la muñeca al subir.",emoji:"💫",video:"https://www.youtube.com/results?search_query=curl+biceps+mancuernas+forma"}]},
+      {ss:true,label:"CIRCUITO CORE ANTI-GRASA ABDOMINAL",exs:[
+        {name:"Plancha frontal",sets:"3×30-40s",rest:0,rl:"—",muscles:"Core completo, transverso abdominal",goal:"Faja abdominal, zona media firme",tip:"Caderas neutras — no subir ni bajar. Activá el ombligo hacia la columna. Respirá.",emoji:"⬛",video:"https://www.youtube.com/results?search_query=plancha+frontal+forma"},
+        {name:"Mountain Climbers",sets:"3×20 reps",rest:0,rl:"—",muscles:"Core, cardio, hombros",goal:"Quema grasa zona media",tip:"Rodillas al pecho alternando rápido. Caderas abajo, no saltando.",emoji:"🏔️",video:"https://www.youtube.com/results?search_query=mountain+climbers+forma"},
+        {name:"Dead Bug",sets:"3×10 c/lado",rest:45,rl:"45s",muscles:"Core profundo, coordinación",goal:"Activación transverso — la clave para zona media plana",tip:"Espalda pegada al piso en todo momento. Si la espalda se despega, reducí el rango.",emoji:"🪲",video:"https://www.youtube.com/results?search_query=dead+bug+exercise+forma"}
+      ]}
+    ],
+    finisher:[
+      {name:"Triceps dips en banco",detail:"3×12 — tonificación parte posterior del brazo",time:"3 min"},
+      {name:"Foam rolling espalda + stretching brazos",detail:"",time:"5 min"}
+    ]
+  },
+  2:{title:"GLÚTEOS B + CORE INTENSO",subtitle:"Segundo día de glúteo + core específico para zona media",duration:"55-65 min",
+    warmup:[
+      {name:"Jump Rope suave / marcha en el lugar",dur:"3 min",muscles:"Cardiovascular liviano"},
+      {name:"Band Glute Bridge",dur:"2×20",muscles:"Activación glúteo antes de cargar"},
+      {name:"Cat-Cow lento",dur:"10 reps",muscles:"Movilidad lumbar, flexibilización pre-core"}
+    ],
+    main:[
+      {ss:false,exs:[{name:"Peso muerto rumano con barra",sets:"4×10",rest:75,rl:"75s",muscles:"Cadena posterior completa — glúteo + isquio",goal:"Fuerza y volumen de glúteo inferior",tip:"La barra baja por la pierna, rodillas levemente dobladas. Sentís los isquios. No doblar la espalda.",emoji:"🏋️",video:"https://www.youtube.com/results?search_query=peso+muerto+rumano+barra"}]},
+      {ss:true,label:"SUPERSET GLÚTEO",exs:[
+        {name:"Hip Thrust con banda de resistencia",sets:"4×15",rest:0,rl:"—",muscles:"Glúteo mayor — extensión de cadera",goal:"Volumen glúteo, definición",tip:"Banda sobre las caderas, pies en el suelo. Squeeze fuerte arriba. Más reps, más quema.",emoji:"🍑",video:"https://www.youtube.com/results?search_query=hip+thrust+banda+resistencia"},
+        {name:"Donkey Kicks con banda",sets:"4×15 c/lado",rest:45,rl:"45s",muscles:"Glúteo mayor, superior",goal:"Levantamiento y redondeamiento",tip:"De cuadrupedia. Pierna en 90°, empujá el talón hacia el techo. Pelvis fija sin rotarla.",emoji:"🌟",video:"https://www.youtube.com/results?search_query=donkey+kicks+banda+forma"}
+      ]},
+      {ss:false,exs:[{name:"Sentadilla con barra o goblet",sets:"3×12",rest:60,rl:"60s",muscles:"Cuádriceps, glúteos, core",goal:"Tonificación piernas",tip:"Sentadilla profunda. Rodillas siguen la punta del pie. Core activado todo el tiempo.",emoji:"🏋️",video:"https://www.youtube.com/results?search_query=sentadilla+barra+forma"}]},
+      {ss:false,exs:[{name:"CIRCUITO CORE × 3 RONDAS",sets:"3 rondas",rest:60,rl:"60s entre rondas",muscles:"Core completo, oblicuos, zona media",goal:"Reducción grasa abdominal + fuerza core",tip:"10 Bicycle Crunches + 20s Hollow Hold + 15 Russian Twist + 30s Side Plank c/lado. Sin parar dentro de la ronda.",emoji:"🔥",video:"https://www.youtube.com/results?search_query=core+circuit+abdominales"}]}
+    ],
+    finisher:[
+      {name:"Lateral band walks + crab walks",detail:"2 series de 15m ida y vuelta",time:"4 min"},
+      {name:"Yoga hip opener stretch",detail:"Pigeon pose + butterfly + figure 4",time:"6 min"}
+    ]
+  },
+  3:{title:"FUNCIONAL + CARDIO",subtitle:"Quema de grasa, resistencia, cuerpo completo",duration:"45-55 min",
+    warmup:[
+      {name:"Jumping jacks + high knees",dur:"2 min",muscles:"Cardiovascular, calentamiento general"},
+      {name:"World's Greatest Stretch",dur:"5 c/lado",muscles:"Movilidad full body"},
+      {name:"Inchworm",dur:"8 reps",muscles:"Cadena posterior, hombros"}
+    ],
+    main:[
+      {ss:false,exs:[{name:"AMRAP 15 min — Circuito quema grasa",sets:"15 minutos continuos",rest:0,rl:"Solo lo necesario",muscles:"Cuerpo completo, cardiovascular",goal:"Quema de grasa — el déficit calórico del día",tip:"10 Sentadillas con salto + 8 Burpees modificados + 10 Mountain Climbers c/lado + 12 Glute Bridges con banda. Anotá cuántas rondas completás.",emoji:"🔥",video:"https://www.youtube.com/results?search_query=hiit+circuit+women+fitness"}]},
+      {ss:true,label:"FUERZA FUNCIONAL",exs:[
+        {name:"Kettlebell Swing",sets:"3×15",rest:0,rl:"—",muscles:"Glúteos, isquios, core, cardio",goal:"Quema + tonificación posterior",tip:"Bisagra de cadera explosiva. La KB flota — no la levantás con los brazos. Squeeze glúteo arriba.",emoji:"⚙️",video:"https://www.youtube.com/results?search_query=kettlebell+swing+mujeres+forma"},
+        {name:"Box Step-Up con mancuernas",sets:"3×12 c/lado",rest:60,rl:"60s",muscles:"Glúteos, cuádriceps, equilibrio",goal:"Tonificación unilateral",tip:"Subí con el talón — activa más el glúteo que si subís con la punta del pie.",emoji:"📦",video:"https://www.youtube.com/results?search_query=step+up+mancuernas+forma"}
+      ]},
+      {ss:false,exs:[{name:"Cardio final — Bici / Caminadora inclinada",sets:"15 minutos",rest:0,rl:"—",muscles:"Cardiovascular, quema de grasa",goal:"Zona de quema de grasa (60-70% FCmax)",tip:"Intensidad moderada. No alta intensidad acá — después del funcional ya estás en zona de grasa. Podés subir la inclinación en vez de la velocidad.",emoji:"🚴",video:"https://www.youtube.com/results?search_query=incline+treadmill+fat+burn"}]}
+    ],
+    finisher:[
+      {name:"Cool-down caminata 5 min",detail:"Bajar pulsaciones gradualmente",time:"5 min"},
+      {name:"Stretching completo",detail:"Cuádriceps, isquios, glúteos, hombros, espalda",time:"8 min"}
+    ]
+  },
+  4:{title:"PIERNAS COMPLETO + TONIFICACIÓN",subtitle:"Piernas y glúteos desde otro ángulo, foco en tono",duration:"55-65 min",
+    warmup:[
+      {name:"Trote suave 5 min",dur:"5 min",muscles:"Cardiovascular, calentamiento general"},
+      {name:"Leg Swings + Hip Circle",dur:"10 c/lado",muscles:"Movilidad cadera"},
+      {name:"Glute Bridge activación",dur:"2×15",muscles:"Activación glúteo pre-entrenamiento"}
+    ],
+    main:[
+      {ss:false,exs:[{name:"Prensa de piernas",sets:"4×12",rest:75,rl:"75s",muscles:"Cuádriceps, glúteos, isquios",goal:"Tonificación general piernas",tip:"Pies a ancho de hombros en la plataforma. Bajá hasta 90°. No bloquear las rodillas arriba. Posición alta de pies = más glúteo.",emoji:"🦵",video:"https://www.youtube.com/results?search_query=prensa+piernas+forma+mujeres"}]},
+      {ss:true,label:"SUPERSET ISQUIOS / GLÚTEO",exs:[
+        {name:"Curl de isquiotibiales en máquina",sets:"3×12",rest:0,rl:"—",muscles:"Isquiotibiales",goal:"Definición cara posterior del muslo",tip:"Movimiento lento en la bajada. No levantar la cadera del banco.",emoji:"🔄",video:"https://www.youtube.com/results?search_query=curl+femoral+maquina+forma"},
+        {name:"Hip Thrust unilateral",sets:"3×10 c/lado",rest:60,rl:"60s",muscles:"Glúteo mayor — unilateral",goal:"Asimetría corregida, volumen glúteo",tip:"Misma técnica que el bilateral pero más exigente. Controlá que la cadera no caiga al lado.",emoji:"🍑",video:"https://www.youtube.com/results?search_query=single+leg+hip+thrust+forma"}
+      ]},
+      {ss:false,exs:[{name:"Zancada reversa con mancuernas",sets:"3×10 c/lado",rest:60,rl:"60s",muscles:"Glúteos, cuádriceps, equilibrio",goal:"Tonificación piernas, activación glúteo",tip:"Paso grande hacia atrás. Rodilla trasera casi toca el piso. Empujá con el talón de la pierna delantera para volver.",emoji:"👣",video:"https://www.youtube.com/results?search_query=zancada+reversa+mancuernas"}]},
+      {ss:true,label:"CORE FINAL",exs:[
+        {name:"Plancha lateral",sets:"3×30s c/lado",rest:0,rl:"—",muscles:"Oblicuos, core lateral",goal:"Cintura definida, core lateral fuerte",tip:"Caderas alineadas, no dejar caer. Podés añadir el hip dip para más activación.",emoji:"📐",video:"https://www.youtube.com/results?search_query=plancha+lateral+forma"},
+        {name:"Reverse Crunch",sets:"3×15",rest:30,rl:"30s",muscles:"Recto abdominal inferior",goal:"Zona media baja — la más difícil de trabajar",tip:"Zona lumbar pegada al piso. Subí las caderas con fuerza abdominal, no con impulso.",emoji:"🔼",video:"https://www.youtube.com/results?search_query=reverse+crunch+forma"}
+      ]}
+    ],
+    finisher:[
+      {name:"Stretching completo piernas",detail:"Cuádriceps, isquiotibiales, glúteos, aductores",time:"7 min"},
+      {name:"Foam rolling piernas",detail:"IT band, cuádriceps, pantorrillas",time:"5 min"}
+    ]
+  }
+};
+
+// ── FIO MEAL DATA ──
+const FIO_MEAL_DAYS=[
+  {label:"DÍA ENTRENO",icon:"🏋️",type:"4-5 días/semana",dayType:"train"},
+  {label:"DÍA DESCANSO",icon:"🛌",type:"Recovery",dayType:"rest"},
+  {label:"PERMITIDO",icon:"🎉",type:"1 vez/semana",dayType:"cheat"}
+];
+
+const FIO_MEALS={
+  train:[
+    {time:"7:30 AM",name:"Desayuno",desc:"Proteína + carbos moderados para arrancar",kcal:"~380 kcal",options:[
+      {title:"Huevos revueltos + tostadas + café",detail:"3 huevos revueltos + 2 tostadas integrales + café con leche descremada",prot:"28g prot",kcal:"375 kcal"},
+      {title:"Yogur griego + avena + fruta",detail:"200g yogur griego + 40g avena + 1 fruta + 1 cda miel",prot:"24g prot",kcal:"370 kcal"},
+      {title:"Omelette + tostada",detail:"3 huevos en omelette + 30g queso fresco + 1 tostada integral",prot:"30g prot",kcal:"360 kcal"}
+    ]},
+    {time:"11:00 AM",name:"Media mañana",desc:"Snack liviano y proteico",kcal:"~180 kcal",options:[
+      {title:"Queso cottage + fruta",detail:"150g queso cottage + 1 fruta mediana",prot:"16g prot",kcal:"185 kcal"},
+      {title:"Yogur griego natural",detail:"200g yogur griego sin azúcar",prot:"18g prot",kcal:"130 kcal"},
+      {title:"2 huevos duros",detail:"Proteína completa, sin azúcar, fácil",prot:"13g prot",kcal:"155 kcal"}
+    ]},
+    {time:"1:30 PM",name:"Almuerzo",desc:"La comida más completa del día — proteína + carbos",kcal:"~550 kcal",options:[
+      {title:"Pollo a la plancha + arroz + ensalada",detail:"180g pechuga + 130g arroz + ensalada de tomate y pepino",prot:"44g prot",kcal:"545 kcal"},
+      {title:"Salmón + papa hervida",detail:"160g salmón + 180g papa + aceite de oliva + limón",prot:"38g prot",kcal:"530 kcal"},
+      {title:"Carne magra + fideos",detail:"160g lomo o cuadril + 130g fideos con tomate natural",prot:"40g prot",kcal:"555 kcal"},
+      {title:"Milanesa de pollo + arroz",detail:"170g milanesa de pollo al horno + 120g arroz + limón",prot:"42g prot",kcal:"540 kcal"}
+    ]},
+    {time:"5:30 PM",name:"Merienda post-entreno",desc:"Post-entreno o merienda — proteína para recuperar",kcal:"~230 kcal",options:[
+      {title:"Queso cottage + miel + almendras",detail:"180g queso cottage + 1 cda miel + 15g almendras",prot:"20g prot",kcal:"235 kcal"},
+      {title:"Pan integral + huevo duro + queso",detail:"1 tostada + 2 huevos duros + 25g queso fresco",prot:"22g prot",kcal:"225 kcal"},
+      {title:"Yogur griego + banana",detail:"200g yogur griego + 1 banana pequeña",prot:"20g prot",kcal:"220 kcal"}
+    ]},
+    {time:"9:00 PM",name:"Cena",desc:"Liviana — proteína alta, carbos bajos",kcal:"~350 kcal",options:[
+      {title:"Pollo al horno + batata chica",detail:"170g pechuga al horno + 100g batata + aceite de oliva",prot:"36g prot",kcal:"350 kcal"},
+      {title:"Omelette + tostadas",detail:"3 huevos + jamón cocido + 1 tostada integral",prot:"30g prot",kcal:"335 kcal"},
+      {title:"Atún + huevos + ensalada",detail:"1 lata atún + 2 huevos duros + tomate + pepino",prot:"34g prot",kcal:"300 kcal"}
+    ]}
+  ],
+  rest:[
+    {time:"8:30 AM",name:"Desayuno",desc:"Más liviano — menos carbos que los días de entreno",kcal:"~320 kcal",options:[
+      {title:"Huevos revueltos + tostada",detail:"3 huevos + 1 tostada integral + café con leche",prot:"26g prot",kcal:"315 kcal"},
+      {title:"Yogur griego + fruta + nueces",detail:"200g yogur griego + 1 fruta + 15g nueces",prot:"22g prot",kcal:"310 kcal"}
+    ]},
+    {time:"11:30 AM",name:"Media mañana",desc:"Snack proteico",kcal:"~160 kcal",options:[
+      {title:"2 huevos duros",detail:"Simple, efectivo, proteína completa",prot:"13g prot",kcal:"155 kcal"},
+      {title:"Queso cottage natural",detail:"150g queso cottage sin azúcar",prot:"16g prot",kcal:"155 kcal"}
+    ]},
+    {time:"1:30 PM",name:"Almuerzo",desc:"Proteína completa, carbos reducidos vs días de gym",kcal:"~480 kcal",options:[
+      {title:"Pollo + batata + ensalada",detail:"180g pollo + 120g batata + tomate + pepino",prot:"40g prot",kcal:"475 kcal"},
+      {title:"Huevos + papa + queso",detail:"4 huevos revueltos + 150g papa + 25g queso",prot:"32g prot",kcal:"480 kcal"},
+      {title:"Lomo + ensalada + pan",detail:"170g lomo a la plancha + ensalada + 1 tostada",prot:"38g prot",kcal:"465 kcal"}
+    ]},
+    {time:"6:00 PM",name:"Merienda",desc:"Liviana",kcal:"~180 kcal",options:[
+      {title:"Yogur griego + miel",detail:"200g yogur griego + 1 cda miel",prot:"18g prot",kcal:"175 kcal"},
+      {title:"Frutas + queso fresco",detail:"2 frutas + 30g queso fresco",prot:"8g prot",kcal:"185 kcal"}
+    ]},
+    {time:"9:00 PM",name:"Cena",desc:"Muy liviana — el cuerpo descansa, no necesita energía",kcal:"~300 kcal",options:[
+      {title:"Sopa de pollo casera + tostada",detail:"Caldo con pechuga desmenuzada + 1 tostada",prot:"28g prot",kcal:"295 kcal"},
+      {title:"Omelette liviano",detail:"3 huevos + tomate + una pizca de queso",prot:"22g prot",kcal:"300 kcal"},
+      {title:"Atún + tostadas",detail:"1 lata atún + 2 tostadas + limón",prot:"24g prot",kcal:"290 kcal"}
+    ]}
+  ],
+  cheat:{
+    isCheat:true,
+    cuandoSi:[
+      {emoji:"✅",titulo:"Después de entrenar ese día",detalle:"Si entrenaste, el cuerpo tolera mejor las calorías extra. El músculo absorbe los carbos como glucógeno."},
+      {emoji:"✅",titulo:"Una vez por semana máximo",detalle:"Un día no arruina el plan. La consistencia es lo que cuenta — 6 días bien y 1 flexible está perfecto."},
+      {emoji:"✅",titulo:"Preferí el almuerzo al cena",detalle:"Si vas a salir a comer rico, mejor al mediodía. Le das más tiempo al cuerpo para usar esas calorías."}
+    ],
+    cuandoNo:[
+      {emoji:"❌",titulo:"Dos días seguidos",detalle:"Un día de más no jode nada. Dos seguidos ya crean un déficit negativo que frena el progreso."},
+      {emoji:"❌",titulo:"A la noche si es mucho",detalle:"Pizza a las 11pm antes de dormir sí se nota más. No es que 'engorda más de noche', pero el cuerpo lo procesa peor."}
+    ],
+    alcohol:[
+      {emoji:"🍷",titulo:"El alcohol pausa la quema de grasa",detalle:"Mientras el cuerpo procesa el alcohol, deja de quemar grasa. No lo cancela, solo lo pausa ~8hs."},
+      {emoji:"🥂",titulo:"Si tomás, tomá poco y comé algo antes",detalle:"Vino o bebidas sin azúcar antes que tragos dulces. Comer antes reduce la absorción rápida."}
+    ],
+    opciones:[
+      {emoji:"🍕",titulo:"Pizza",detalle:"2-3 porciones está bien. Evitar las ultra-grasosas tipo 4 quesos si podés elegir."},
+      {emoji:"🍔",titulo:"Hamburguesa",detalle:"Sin drama. Con ensalada en vez de papas fritas es una buena versión."},
+      {emoji:"🍝",titulo:"Pastas",detalle:"Perfectas. Un plato de pastas con buena salsa no es ningún desastre."},
+      {emoji:"🍫",titulo:"Chocolate / dulce",detalle:"Si se te antoja dulce, mejor un chocolate negro que una bolsa de galletitas. Satisface más con menos."}
+    ]
+  }
+};
+
+// ── FIO RECOVERY DATA ──
+const FIO_RECOVERY={
+  pilates:[
+    {name:"Hundred (los cien)",dur:"60 segundos",target:"Core profundo, respiración",tip:"Piernas a 45°, brazos pulsando. Inhalar 5 pompas, exhalar 5. Core activado. Si duele el cuello, apoyá la cabeza.",ts:60},
+    {name:"Single Leg Stretch",dur:"10 reps c/lado",target:"Oblicuos, flexores cadera",tip:"Rodilla al pecho alternando. Pelvis neutra, no levantar la cadera. Lento y controlado.",ts:0},
+    {name:"Glute Bridge Pilates",dur:"3×15 con pausa arriba",target:"Glúteo mayor, zona lumbar",tip:"Subí vértebra por vértebra. En la cima, apretá el glúteo 2 segundos. Bajá igual de lento.",ts:0},
+    {name:"Clam Shell con banda",dur:"3×15 c/lado",target:"Glúteo medio, rotación externa",tip:"Pies juntos, rodilla sube como almeja. No mover la pelvis. El glúteo medio es el que trabaja.",ts:0},
+    {name:"Roll Down",dur:"8 reps",target:"Columna, descompresión lumbar",tip:"De pie, bajá vértebra por vértebra hacia el piso. Llegás abajo, respirás, subís igual. Muy lento.",ts:0},
+    {name:"Child's Pose + Lat Stretch",dur:"60 segundos",target:"Espalda baja, dorsales, hombros",tip:"Brazos extendidos, cabeza apoyada. Respirá profundo — cada exhalación dejás caer un poco más.",ts:60}
+  ],
+  stretching:[
+    {name:"Pigeon Pose",dur:"90s c/lado",target:"Glúteo, piriforme, cadera",tip:"Pierna delantera doblada, trasera extendida. Caer hacia adelante con los antebrazos. Respirá profundo.",ts:90},
+    {name:"Butterfly Stretch",dur:"60 segundos",target:"Aductores, cadera interna",tip:"Planta de los pies juntas, rodillas caen. Podés presionar levemente las rodillas hacia abajo con los codos.",ts:60},
+    {name:"Standing Quad Stretch",dur:"45s c/lado",target:"Cuádriceps, flexores de cadera",tip:"De pie, talón al glúteo. Pelvis neutra — no arquear la espalda. Con la pared si necesitás equilibrio.",ts:45},
+    {name:"Forward Fold",dur:"60 segundos",target:"Isquiotibiales, espalda baja",tip:"Rodillas levemente dobladas al principio, dejá que los isquios abran progresivamente. Sin rebote.",ts:60},
+    {name:"Cat-Cow",dur:"10 reps lentas",target:"Columna completa, movilidad",tip:"Inhalar → arquear la espalda (cow). Exhalar → redondear (cat). Lento, fluido, sin parar.",ts:0},
+    {name:"Hip Flexor Stretch",dur:"60s c/lado",target:"Psoas, flexores cadera",tip:"Estocada, rodilla trasera en el piso. Pelvis hacia adelante, torso erguido. Sentís el tirón en la ingle delantera.",ts:60}
+  ],
+  core:[
+    {name:"Vacío abdominal (Vacuum)",dur:"5×10 segundos",target:"Transverso abdominal — la faja natural",tip:"Exhalar todo el aire y meter el ombligo hacia la columna. Retener 10s. Es el ejercicio más efectivo para cintura.",ts:10},
+    {name:"Bird Dog",dur:"3×10 c/lado",target:"Core, estabilidad lumbar, glúteo",tip:"De cuadrupedia. Extender brazo y pierna contrarios sin rotar. Columna neutra. Lento y controlado.",ts:0},
+    {name:"Dead Bug suave",dur:"3×8 c/lado",target:"Core profundo, coordinación",tip:"Espalda en el piso. Extender pierna y brazo contrario sin despegar la espalda baja.",ts:0},
+    {name:"Pallof Press con banda",dur:"3×12 c/lado",target:"Core anti-rotación, oblicuos",tip:"Banda a la altura del pecho, extender brazos sin rotar. Cuanto más lejos la banda del cuerpo, más difícil.",ts:0},
+    {name:"Side Plank suave",dur:"3×20s c/lado",target:"Oblicuos, core lateral",tip:"Rodillas apoyadas si es demasiado difícil. Caderas alineadas. Respirá normalmente.",ts:20},
+    {name:"Stretching lumbar final",dur:"60 segundos",target:"Espalda baja, descompresión",tip:"Knees to chest en el piso. Rodillas al pecho, abrazalas y mecete suavemente.",ts:60}
+  ]
+};
+
+// ══════════════════════════════════════════════════════════════════
+// FIO STATE
+// ══════════════════════════════════════════════════════════════════
+let fioCurrentDay=0;
+let fioCompleted={};
+let fioWeightHistory=[];
+let fioMedidas={};
+let fioCurrentMealDay=0;
+let fioWaterCount=0;
+let fioCurrentRecovery='pilates';
+let fioRpe={};
+
+function saveFioAll(){
+  saveLS('fio_completed',fioCompleted);
+  saveLS('fio_weights',fioWeightHistory);
+  saveLS('fio_medidas',fioMedidas);
+  saveLS('fio_meals',fioCurrentMealDay);
+  saveLS('fio_water',fioWaterCount);
+  saveLS('fio_rpe',fioRpe);
+}
+function loadFioAll(){
+  fioCompleted=loadLS('fio_completed',{});
+  fioWeightHistory=loadLS('fio_weights',[]);
+  fioMedidas=loadLS('fio_medidas',{});
+  fioCurrentMealDay=loadLS('fio_meals',0);
+  fioWaterCount=loadLS('fio_water',0);
+  fioRpe=loadLS('fio_rpe',{});
+}
+
+// ══════════════════════════════════════════════════════════════════
+// PROFILE SWITCH
+// ══════════════════════════════════════════════════════════════════
+let currentProfile='nico';
+function switchProfile(p){
+  currentProfile=p;
+  document.getElementById('nicoPanel').classList.toggle('hidden', p==='fio');
+  document.getElementById('fioPanel').classList.toggle('active', p==='fio');
+  document.getElementById('btnNico').className='profile-btn'+(p==='nico'?' active-nico':'');
+  document.getElementById('btnFio').className='profile-btn'+(p==='fio'?' active-fio':'');
+  if(p==='fio'){
+    renderFioDaySelector();
+    renderFioWorkout(fioCurrentDay);
+    renderFioMealDaySelector();
+    renderFioMeals(fioCurrentMealDay);
+    renderFioWaterTrack();
+    renderFioRecovery('pilates');
+    renderFioProgress();
+    updateFioKgToGo();
+  }
+}
+
+// ══════════════════════════════════════════════════════════════════
+// FIO UTILS
+// ══════════════════════════════════════════════════════════════════
+function fioSwitchTab(id,btn){
+  document.querySelectorAll('.fio-tab-panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.fio-tab-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('fio-tab-'+id).classList.add('active');
+  btn.classList.add('active');
+  if(id==='progreso')renderFioProgress();
+}
+
+function updateFioKgToGo(){
+  const last=fioWeightHistory.length>0?fioWeightHistory[fioWeightHistory.length-1].w:66;
+  const diff=Math.max(0,(last-59.5)).toFixed(1);
+  document.getElementById('fioKgToGo').textContent=diff;
+}
+
+// ══════════════════════════════════════════════════════════════════
+// FIO WORKOUT RENDER
+// ══════════════════════════════════════════════════════════════════
+function renderFioDaySelector(){
+  const c=document.getElementById('fioDaySelector');
+  c.innerHTML=FIO_DAYS.map((d,i)=>`
+    <button class="fio-day-btn ${i===fioCurrentDay?'active':''}" onclick="fioSelectDay(${i})">
+      <span class="fdb-num">${d.emoji}</span>
+      <span class="fdb-label">${d.focus}</span>
+    </button>`).join('');
+}
+
+function fioSelectDay(i){
+  fioCurrentDay=i;
+  renderFioDaySelector();
+  renderFioWorkout(i);
+}
+
+function renderFioWorkout(di){
+  const w=FIO_WORKOUTS[di];
+  const d=FIO_DAYS[di];
+  const key=`fio_day${di}`;
+  if(!fioCompleted[key])fioCompleted[key]={};
+  let total=0,done=0;
+  w.warmup.forEach(()=>total++);
+  w.main.forEach(b=>b.exs.forEach(()=>total++));
+
+  let html=`<div class="fade-in">
+    <div style="margin-bottom:14px">
+      <span class="phase-tag" style="background:rgba(244,114,182,0.1);border-color:rgba(244,114,182,0.3);color:#22c55e">${d.tag}</span>
+      <span class="phase-tag" style="background:rgba(167,139,250,0.1);border-color:rgba(167,139,250,0.3);color:#a78bfa">⏱ ${w.duration}</span>
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:2rem;letter-spacing:2px;line-height:1;margin-top:8px">${w.title}</div>
+      <div style="color:var(--muted);font-size:0.82rem;margin-top:5px">${w.subtitle}</div>
+    </div>`;
+
+  // Warmup
+  html+=`<div class="fio-section-header"><span class="fio-section-title">🔥 ENTRADA EN CALOR</span><div class="section-line"></div></div>`;
+  w.warmup.forEach((ex,i)=>{
+    const ek=`wu_${i}`;
+    const isDone=!!fioCompleted[key][ek];
+    html+=`<div class="fio-card ${isDone?'completed':''}" id="fcard_${key}_${ek}">
+      <div class="fio-card-main" onclick="fioToggleDetail('${key}','${ek}')">
+        <div class="fio-card-emoji">🔸</div>
+        <div><div class="fio-card-name">${ex.name}</div><div class="fio-card-muscles">${ex.muscles}</div></div>
+        <div class="fio-card-sets"><div class="fio-sets-label">${ex.dur}</div></div>
+      </div>
+      <div class="fio-card-detail" id="fdetail_${key}_${ek}">
+        <button class="fio-check-btn" onclick="fioToggleComplete('${key}','${ek}',event)">${isDone?'✅ Listo':'○ Marcar hecho'}</button>
+      </div></div>`;
+  });
+
+  // Main
+  html+=`<div class="fio-section-header"><span class="fio-section-title">💪 ENTRENAMIENTO PRINCIPAL</span><div class="section-line"></div></div>`;
+  w.main.forEach((block,bi)=>{
+    if(block.ss)html+=`<div class="fio-superset-label">⚡ ${block.label}</div>`;
+    block.exs.forEach((ex,ei)=>{
+      const ek=`main_${bi}_${ei}`;
+      const isDone=!!fioCompleted[key][ek];
+      const setsN=Math.min(parseInt(ex.sets)||3,6);
+      const dots=Array.from({length:setsN},(_,si)=>{
+        const sk=`${key}_${ek}_s${si}`;
+        return `<div class="fio-set-dot ${fioCompleted[sk]?'done':''}" onclick="fioToggleSet('${key}','${ek}','${sk}',${si},${setsN},${ex.rest||0},event)">${si+1}</div>`;
+      }).join('');
+      html+=`<div class="fio-card ${isDone?'completed':''}" id="fcard_${key}_${ek}">
+        <div class="fio-card-main" onclick="fioToggleDetail('${key}','${ek}')">
+          <div class="fio-card-emoji">${ex.emoji}</div>
+          <div>
+            <div class="fio-card-name">${ex.name}</div>
+            <div class="fio-card-muscles">${ex.muscles}</div>
+            <div class="fio-card-goal">🎯 ${ex.goal}</div>
+          </div>
+          <div class="fio-card-sets"><div class="fio-sets-label">${ex.sets}</div><div class="fio-rest-label">desc: ${ex.rl}</div></div>
+        </div>
+        <div class="fio-card-detail" id="fdetail_${key}_${ek}">
+          <div class="fio-tip">💡 <b>Técnica:</b> ${ex.tip}</div>
+          <div style="margin-top:10px;font-size:0.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">Series completadas</div>
+          <div class="fio-set-tracker">${dots}</div>
+          ${ex.rest>0?`<button class="fio-timer-btn" onclick="startTimer(${ex.rest},'${ex.name}');event.stopPropagation()">⏱ Descanso ${ex.rl}</button>`:''}
+          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:8px">
+            <button class="fio-check-btn" onclick="fioToggleComplete('${key}','${ek}',event)">${isDone?'✅ Completado':'○ Marcar hecho'}</button>
+            <a href="${ex.video}" target="_blank" class="video-link" style="border-color:rgba(244,114,182,0.3);color:#22c55e" onclick="event.stopPropagation()">▶ Video</a>
+          </div>
+        </div></div>`;
+    });
+  });
+
+  // Finisher
+  html+=`<div class="fio-section-header"><span class="fio-section-title" style="color:#fb923c">🔥 FINISHER</span><div class="section-line"></div></div>
+    <div style="background:linear-gradient(135deg,rgba(244,114,182,0.08),rgba(167,139,250,0.05));border:1px solid rgba(244,114,182,0.25);border-radius:12px;padding:16px;margin-bottom:12px">
+    <div style="font-family:'Bebas Neue',sans-serif;font-size:1.2rem;letter-spacing:2px;color:#22c55e;margin-bottom:10px">CIERRE</div>`;
+  w.finisher.forEach(f=>{
+    html+=`<div class="finisher-item"><div><div style="font-weight:500">${f.name}</div>${f.detail?`<div style="font-size:0.72rem;color:var(--muted);margin-top:2px">${f.detail}</div>`:''}</div><div class="finisher-time" style="color:#22c55e">${f.time}</div></div>`;
+  });
+
+  // RPE
+  const rpe=fioRpe[key]||{rpe:0,note:''};
+  const rpeBtns=Array.from({length:10},(_,i)=>`<button class="fio-rpe-btn ${rpe.rpe===i+1?'active':''}" onclick="setFioRpe('${key}',${i+1},this)">${i+1}</button>`).join('');
+  html+=`</div><div class="fio-rpe-section">
+    <div style="font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:2px;margin-bottom:10px">📝 SESIÓN DE HOY</div>
+    <div style="font-size:0.78rem;color:var(--muted);margin-bottom:10px">¿Cómo te sentiste? (1=muy fácil, 10=al límite)</div>
+    <div style="display:flex;gap:5px;flex-wrap:wrap">${rpeBtns}</div>
+    <textarea class="rpe-note" id="fioRpeNote_${key}" placeholder="Notas: sensaciones, progresos, cómo te quedaron los glúteos 🌸...">${rpe.note||''}</textarea>
+    <button class="rpe-save-btn" style="background:rgba(244,114,182,0.1);border-color:rgba(244,114,182,0.3);color:#22c55e" onclick="saveFioRpe('${key}')">💾 Guardar sesión</button>
+    <div style="color:#22c55e;font-size:0.75rem;margin-top:6px;display:none" id="fioRpeSaved_${key}">✅ Guardado</div>
+  </div></div>`;
+
+  document.getElementById('fioWorkoutContent').innerHTML=html;
+  updateFioProgress(di);
+}
+
+function updateFioProgress(di){
+  const w=FIO_WORKOUTS[di];
+  const key=`fio_day${di}`;
+  let total=0,done=0;
+  w.warmup.forEach((_,i)=>{total++;if(fioCompleted[key]?.[`wu_${i}`])done++;});
+  w.main.forEach((b,bi)=>b.exs.forEach((_,ei)=>{total++;if(fioCompleted[key]?.[`main_${bi}_${ei}`])done++;}));
+  const pct=total>0?Math.round((done/total)*100):0;
+  document.getElementById('fioProgressText').textContent=`${done} / ${total}`;
+  document.getElementById('fioProgressFill').style.width=`${pct}%`;
+}
+
+function fioToggleDetail(dk,ek){const el=document.getElementById(`fdetail_${dk}_${ek}`);if(el)el.classList.toggle('open');}
+function fioToggleComplete(dk,ek,event){
+  event.stopPropagation();
+  if(!fioCompleted[dk])fioCompleted[dk]={};
+  fioCompleted[dk][ek]=!fioCompleted[dk][ek];
+  const card=document.getElementById(`fcard_${dk}_${ek}`);
+  if(card)card.classList.toggle('completed',fioCompleted[dk][ek]);
+  const btn=card?.querySelector('.fio-check-btn');
+  if(btn)btn.textContent=fioCompleted[dk][ek]?'✅ Completado':'○ Marcar hecho';
+  updateFioProgress(fioCurrentDay);
+  saveFioAll();
+}
+function fioToggleSet(dk,ek,sk,si,total,restSec,event){
+  event.stopPropagation();
+  const el=event.currentTarget;
+  el.classList.toggle('done');
+  fioCompleted[sk]=el.classList.contains('done');
+  if(el.classList.contains('done')&&restSec>0){
+    let doneSets=0;
+    for(let i=0;i<total;i++){if(fioCompleted[`${dk}_${ek}_s${i}`])doneSets++;}
+    if(doneSets<total)startTimer(restSec);
+  }
+  saveFioAll();
+}
+function setFioRpe(dk,val,btn){
+  if(!fioRpe[dk])fioRpe[dk]={rpe:0,note:''};
+  fioRpe[dk].rpe=val;
+  document.querySelectorAll('.fio-rpe-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+}
+function saveFioRpe(dk){
+  if(!fioRpe[dk])fioRpe[dk]={rpe:0,note:''};
+  const el=document.getElementById(`fioRpeNote_${dk}`);
+  if(el)fioRpe[dk].note=el.value;
+  saveFioAll();
+  const saved=document.getElementById(`fioRpeSaved_${dk}`);
+  if(saved){saved.style.display='block';setTimeout(()=>saved.style.display='none',2000);}
+}
+
+// ══════════════════════════════════════════════════════════════════
+// FIO NUTRITION
+// ══════════════════════════════════════════════════════════════════
+function renderFioMealDaySelector(){
+  const c=document.getElementById('fioMealDaySelector');
+  c.innerHTML=FIO_MEAL_DAYS.map((d,i)=>`
+    <button class="fio-meal-day-btn ${i===fioCurrentMealDay?'active':''}" onclick="fioSelectMealDay(${i})">
+      <span class="fmdb-icon">${d.icon}</span>
+      <div style="font-weight:600;font-size:0.72rem">${d.label}</div>
+      <div style="font-size:0.6rem;opacity:0.7;margin-top:2px">${d.type}</div>
+    </button>`).join('');
+}
+function fioSelectMealDay(i){fioCurrentMealDay=i;renderFioMealDaySelector();renderFioMeals(i);}
+
+function renderFioMeals(di){
+  const dayType=FIO_MEAL_DAYS[di].dayType;
+  const data=FIO_MEALS[dayType];
+  if(dayType==='cheat'){
+    const d=data;
+    const mkS=(title,color,items)=>items.map(it=>`<div style="display:flex;gap:12px;align-items:flex-start;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:8px"><span style="font-size:1.3rem;flex-shrink:0">${it.emoji}</span><div><div style="font-weight:600;font-size:0.88rem;margin-bottom:3px">${it.titulo}</div><div style="font-size:0.78rem;color:var(--muted);line-height:1.5">${it.detalle}</div></div></div>`).join('');
+    const section=(t,c,items)=>`<div style="margin-bottom:16px"><div style="font-family:'Bebas Neue',sans-serif;font-size:1rem;letter-spacing:2px;color:${c};margin-bottom:8px">${t}</div>${mkS(t,c,items)}</div>`;
+    document.getElementById('fioMealContent').innerHTML=`
+      <div style="background:linear-gradient(135deg,rgba(244,114,182,0.1),rgba(244,114,182,0.03));border:1px solid rgba(244,114,182,0.3);border-radius:14px;padding:18px;margin-bottom:14px">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:1.5rem;letter-spacing:2px;color:#22c55e;margin-bottom:5px">🎉 EL PERMITIDO</div>
+        <div style="font-size:0.8rem;color:var(--muted)">Una vez por semana. Sin culpa, sin drama.</div>
+      </div>
+      ${section('✅ CUÁNDO SÍ','var(--accent3)',d.cuandoSi)}
+      ${section('❌ CUÁNDO NO','#ff4444',d.cuandoNo)}
+      ${section('🍹 SOBRE EL ALCOHOL','#a78bfa',d.alcohol)}
+      ${section('🍕 QUÉ COMER','#22c55e',d.opciones)}`;
+    return;
+  }
+  let html='<div class="meal-timeline">';
+  const fioMealSel=loadLS('fio_meal_sel',{});
+  data.forEach((meal,mi)=>{
+    const sk=`fio_${di}_${mi}`;
+    const sel=fioMealSel[sk]??null;
+    const selOpt=sel!==null?meal.options[sel]:null;
+    const opts=meal.options.map((opt,oi)=>`
+      <div class="meal-option ${sel===oi?'selected':''}" onclick="fioSelectMealOption(${di},${mi},${oi},'${sk}')">
+        <div class="option-title">${opt.title}</div>
+        <div class="option-detail">${opt.detail}</div>
+        <div class="option-macros"><span class="opt-macro prot">🥩 ${opt.prot}</span><span class="opt-macro kcal">⚡ ${opt.kcal}</span></div>
+      </div>`).join('');
+    html+=`<div class="meal-block" style="border-color:rgba(244,114,182,0.15)">
+      <div class="meal-block-header" onclick="toggleFioMealDetail(${mi})">
+        <div class="meal-time-badge" style="color:#22c55e">${meal.time}</div>
+        <div class="meal-info">
+          <div class="meal-name">${meal.name}${selOpt?' <span style="color:#22c55e;font-size:0.7rem">✓</span>':''}</div>
+          <div class="meal-desc">${selOpt?selOpt.title:meal.desc}</div>
+        </div>
+        <div class="meal-kcal" style="color:#22c55e">${meal.kcal}</div>
+      </div>
+      <div class="meal-detail-body" id="fioMealDetail_${mi}">
+        <div class="meal-options">${opts}</div>
+      </div></div>`;
+  });
+  html+='</div>';
+  document.getElementById('fioMealContent').innerHTML=html;
+}
+function toggleFioMealDetail(mi){const el=document.getElementById(`fioMealDetail_${mi}`);if(el)el.classList.toggle('open');}
+function fioSelectMealOption(di,mi,oi,sk){
+  const fioMealSel=loadLS('fio_meal_sel',{});
+  fioMealSel[sk]=fioMealSel[sk]===oi?undefined:oi;
+  saveLS('fio_meal_sel',fioMealSel);
+  renderFioMeals(di);
+  setTimeout(()=>{const el=document.getElementById(`fioMealDetail_${mi}`);if(el)el.classList.add('open');},10);
+}
+
+// FIO HYDRATION
+function renderFioWaterTrack(){
+  const c=document.getElementById('fioWaterTrack');
+  if(!c)return;
+  c.innerHTML=Array.from({length:8},(_,i)=>`<div class="water-glass ${i<fioWaterCount?'filled':''}" onclick="fioToggleWater(${i})"></div>`).join('');
+  document.getElementById('fioWaterCount').textContent=fioWaterCount;
+  document.getElementById('fioWaterMl').textContent=(fioWaterCount*250).toLocaleString();
+}
+function fioToggleWater(i){fioWaterCount=fioWaterCount===i+1?i:i+1;saveFioAll();renderFioWaterTrack();}
+
+// ══════════════════════════════════════════════════════════════════
+// FIO PROGRESS
+// ══════════════════════════════════════════════════════════════════
+function saveFioWeight(){
+  const input=document.getElementById('fioWeightInput');
+  const val=parseFloat(input.value);
+  if(isNaN(val)||val<40||val>120){input.style.borderColor='#ff4444';return;}
+  input.style.borderColor='var(--border)';
+  const dateKey=new Date().toLocaleDateString('es-AR',{day:'2-digit',month:'2-digit'});
+  const existing=fioWeightHistory.findIndex(h=>h.date===dateKey);
+  if(existing>=0)fioWeightHistory[existing].w=val;
+  else fioWeightHistory.push({date:dateKey,w:val});
+  if(fioWeightHistory.length>12)fioWeightHistory=fioWeightHistory.slice(-12);
+  saveFioAll();
+  input.value='';
+  renderFioProgress();
+  updateFioKgToGo();
+}
+function saveFioMedidas(){
+  fioMedidas={
+    cintura:document.getElementById('fioCintura').value,
+    cadera:document.getElementById('fioCadera').value,
+    gluteo:document.getElementById('fioGluteo').value,
+    brazo:document.getElementById('fioBrazo').value
+  };
+  saveFioAll();
+}
+function renderFioProgress(){
+  const log=document.getElementById('fioWtLog');
+  const chart=document.getElementById('fioWtChart');
+  const barFill=document.getElementById('fioGoalBarFill');
+  const barLabel=document.getElementById('fioGoalBarLabel');
+  if(!log)return;
+  if(fioWeightHistory.length===0){
+    log.innerHTML='<div style="color:var(--muted);font-size:0.8rem;padding:8px 0">Todavía no hay registros. Empezá hoy 🌸</div>';
+    chart.innerHTML='';
+    return;
+  }
+  // Progress bar: start=66, goal=59.5
+  const latest=fioWeightHistory[fioWeightHistory.length-1].w;
+  const start=66, goal=59.5;
+  const pct=Math.min(100,Math.max(0,Math.round(((start-latest)/(start-goal))*100)));
+  barFill.style.width=pct+'%';
+  barLabel.textContent=`${latest} kg actual → meta ${goal} kg (${pct}% del camino 🎯)`;
+  // Log entries
+  log.innerHTML=[...fioWeightHistory].reverse().slice(0,6).map(h=>`
+    <div class="fio-wt-entry">
+      <span class="fio-wt-date">${h.date}</span>
+      <span class="fio-wt-val">${h.w} kg</span>
+    </div>`).join('');
+  // Chart
+  if(fioWeightHistory.length>=2){
+    const maxW=Math.max(...fioWeightHistory.map(h=>h.w));
+    const minW=Math.min(...fioWeightHistory.map(h=>h.w));
+    const range=maxW-minW||1;
+    chart.innerHTML=fioWeightHistory.map(h=>{
+      const pct=30+Math.round(((h.w-minW)/range)*70);
+      return `<div class="fio-wt-bar-wrap"><div class="fio-wt-bar-val">${h.w}</div><div class="fio-wt-bar" style="height:${pct}%"></div><div class="fio-wt-bar-label">${h.date}</div></div>`;
+    }).join('');
+  } else chart.innerHTML='<div style="color:var(--muted);font-size:0.75rem">Registrá al menos 2 días para ver el gráfico</div>';
+  // Medidas
+  if(fioMedidas.cintura){document.getElementById('fioCintura').value=fioMedidas.cintura;}
+  if(fioMedidas.cadera){document.getElementById('fioCadera').value=fioMedidas.cadera;}
+  if(fioMedidas.gluteo){document.getElementById('fioGluteo').value=fioMedidas.gluteo;}
+  if(fioMedidas.brazo){document.getElementById('fioBrazo').value=fioMedidas.brazo;}
+}
+
+// ══════════════════════════════════════════════════════════════════
+// FIO RECOVERY
+// ══════════════════════════════════════════════════════════════════
+function selectFioRecovery(type,btn){
+  fioCurrentRecovery=type;
+  document.querySelectorAll('#fio-tab-recovery .rec-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderFioRecovery(type);
+}
+function renderFioRecovery(type){
+  const exs=FIO_RECOVERY[type];
+  const c=document.getElementById('fioRecoveryContent');
+  let html='<div class="mobility-list">';
+  exs.forEach((ex,i)=>{
+    html+=`<div class="mobility-card" style="border-color:rgba(244,114,182,0.15)">
+      <div class="mobility-header" onclick="fioToggleMobDetail(${i})">
+        <div class="mob-order" style="color:rgba(244,114,182,0.3)">${i+1}</div>
+        <div class="mob-info">
+          <div class="mob-name">${ex.name}</div>
+          <div class="mob-target">${ex.target}</div>
+        </div>
+        <div class="mob-duration" style="color:#22c55e">${ex.dur}</div>
+      </div>
+      <div class="mob-detail" id="fioMob_${i}">
+        <div class="mob-tip" style="border-left-color:#22c55e;background:rgba(244,114,182,0.05)">💡 ${ex.tip}</div>
+        ${ex.ts>0?`<button class="fio-timer-btn" onclick="startTimer(${ex.ts},'${ex.name}');event.stopPropagation()">⏱ Iniciar ${fmtTime(ex.ts)}</button>`:''}
+      </div>
+    </div>`;
+  });
+  html+='</div>';
+  c.innerHTML=html;
+}
+function fioToggleMobDetail(i){const el=document.getElementById(`fioMob_${i}`);if(el)el.classList.toggle('open');}
+</script>
+</body>
+</html>
